@@ -135,6 +135,20 @@ Data <- Data %>%
 
 # ---- Rainfall-Runoff Model ----
 
+# PARAMETERS!!
+
+# Before we get started lets think about each parameter. 
+
+# L1 = Amount of water that reaches the surface AFTER interception, AFTER interception!!! 
+# 0.2 means 20% of water reaches the surface. 
+# 0.6 means 60% of water reaches the surface.
+
+# But hang on, its gonna differ seasonally. 
+
+
+
+
+
 # The easiest way to understand this is to go through one month first, and then the rest of months will follow the same idea. 
 
 # ---- INITIAL SURFACE STORAGE (CU/M)
@@ -142,7 +156,7 @@ Data <- Data %>%
 # This is the amount of water held in the surface storage from previous months. For Jan, lets just start it on 0. 
 
 Rainfall_Runoff_Model <- Data %>%
-  mutate(Initial_surface_storage = ifelse(format(Date, "%m") == "01", 0, NA)))
+  mutate(Initial_surface_storage = ifelse(format(Date, "%m") == "01", 0, NA))
 
 # ---- RAINFALL
 
@@ -167,12 +181,13 @@ Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
 
 # For this we can plot out evapotranspiration and see how it varies throughout the year.
 
-ggplot(Rainfall_Runoff_Model, aes(x = Month, y = Evapotranspiration_mm)) + # When plotting multiple variables with geom_line(), must specify group aesthetic to ensure lines are drawn for EACH variable. 
+ggplot(Rainfall_Runoff_Model, aes(x = Date, y = Evapotranspiration_mm)) + 
   geom_line() +
-  labs(title = "Evapotranspiration Over Time", 
-       x = "Date", 
+  labs(title = "Evapotranspiration levels in 2015", 
+       x = "Month", 
        y = "Evapotranspiration (mm)") +
-  scale_x_date(date_labels = "%b", date_breaks = "1 month")
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +  # Show month abbreviations
+  theme_minimal()  # Optional: Use a clean theme
 # Now we can see how Et varies seasonally and when it peaks. 
 
 # Nov-April low-none Et
@@ -180,6 +195,46 @@ ggplot(Rainfall_Runoff_Model, aes(x = Month, y = Evapotranspiration_mm)) + # Whe
 # Summer aka June-Aug VVV high!
 
 # So what does this mean?
+# More evapotranspiration = less rainfall reaching the ground. 
+
+# Now, think about interception.
+
+# For this look at vegetation cover over the catchment on CEH. Is it mostly urban? rural? woodland? agriculture? 
+# CEH: Mostly grassland and mountain/heath/bog. With a little amount of arable and woodland and very very small section of built-up areas.
+
+# These 2 factors (Et and interception) help us decide a loss parameter for the model called L1. 
+
+# L1 
+
+# Based on the Et graph, we may choose to separate into seasons. 
+
+# So Nov-March = Little Et, little interception by urban/woodland therefore we may expect a large amount of rainfall to reach the surface. 
+
+# 0.8 = 80% of rainfall reaches the surface. 20% is either intercepted or evapotranspirated.
+
+# As for the other months, April-May and Aug-Oct with mid Et, a parameter of 0.5 may make more sense
+
+# And for June to July with v v v high Et, a parameter of 0.2 makes sense. 
+
+Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
+  mutate(
+    Surface_storage = case_when(
+      format(Date, "%m") %in% c("11", "12", "01", "02", "03") ~ Initial_surface_storage + 0.8 * Total_water_input,
+      format(Date, "%m") %in% c("04", "05", "08", "09", "10") ~ Initial_surface_storage + 0.5 * Total_water_input,
+      format(Date, "%m") %in% c("06", "07") ~ Initial_surface_storage + 0.2 * Total_water_input,
+      TRUE ~ Initial_surface_storage # Default if none of the conditions are met
+    )
+  )
+
+
+  # Add new column called Surface storage.
+
+# As for the other months, April-June and Aug to Nov with mid Et, a parameter of 0.5 may make more sense
+# And for June to July with v v v high Et, a parameter of 0.2 makes sense. 
+
+Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
+  filter(format(Date, "%m") %in% c("11", "12", "01", "02", "03", "04")) %>% # Filters from Nov (11) through to April (04)
+  mutate(Surface_storage = Initial_surface_storage + 0.8 * Total_water_input)
 
 
 
