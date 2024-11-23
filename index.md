@@ -1,4 +1,29 @@
-<center><img src="{{ site.baseurl }}/tutheaderbl.png" alt="Img"></center>
+---
+layout: default
+---
+
+{% Into to Rainfall-Runoff Modelling %}
+	{% include page-banner.html %}
+{% endif %}
+
+
+<div class="content">
+	<p class="author">
+		{% if page.author %}
+			Created by {{ page.author }}
+		{% endif %}
+		{% if page.updated %}
+			- last updated {{ page.updated | date_to_long_string: "ordinal" }}
+		{% endif %}
+		{% if page.updater %}
+			by {{ page.updater }}
+		{% endif %}
+	</p>
+	<hr/>
+	{{ content }}
+	{% include survey.html %}
+	
+</div><center><img src="{{ site.baseurl }}/tutheaderbl.png" alt="Img"></center>
 
 To add images, replace `tutheaderbl1.png` with the file name of any image you upload to your GitHub repository.
 
