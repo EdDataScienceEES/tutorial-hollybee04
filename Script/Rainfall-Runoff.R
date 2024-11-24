@@ -1,7 +1,7 @@
 # Tutorial: How to make a Rainfall-Runoff Model
 # Written by Holly Bacon 2024
 
-# ---- Library ----
+# 1. ---- Library ----
 
 library(nasapower)
 library(dplyr)
@@ -9,8 +9,9 @@ library(ggplot2)
 library(tidyr)
 library(tidyverse)
 library(lubridate)
+library(purrr)
 
-# ---- Load data ----
+# 2. ---- Load data ----
 
 Discharge <- read.csv("data/Daily_Flow.csv")
 Precipitation <- read.csv("data/Rainfall_Data.csv")
@@ -32,7 +33,7 @@ Evapotranspiration <- get_power(
   dates = c("2015-01-01", "2017-12-31")
 )
 
-# ---- Data preparation ----
+# 3. ---- Data preparation ----
 
 # Remove first 19 rows of metadata
 
@@ -42,225 +43,119 @@ Precipitation_clean <- Precipitation[20:nrow(Precipitation), ]
 
 # Name them
 
-colnames(Discharge_clean) <- c("Date", "Discharge_m3pers")
+colnames(Discharge_clean) <- c("Date", "Daily_flow_m3pers") # m3/s
 
 colnames(Precipitation_clean) <- c("Date", "Precipitation_mm")
 
 # Select necessary columns
 
 Discharge_clean <- Discharge_clean %>%
-  select(Date, Discharge_m3pers )
+  select(Date, Daily_flow_m3pers )
 
 Precipitation_clean <- Precipitation_clean %>%
   select(Date, Precipitation_mm )
 
 Evapotranspiration_clean <- Evapotranspiration %>%
-  select(YYYYMMDD, EVPTRNS)
+  select(YEAR, MM, DD, DOY, YYYYMMDD, EVPTRNS)
 
-colnames(Evapotranspiration_clean) <- c("Date", "Evapotranspiration_mm")
+colnames(Evapotranspiration_clean) <- c("Year", "MM", "DD", "DOY", "Date", "Et_mm")
 
-# ---- Fixing units ----
+Evapotranspiration_clean$MM <- month.abb[Evapotranspiration_clean$MM] # Change to names instead of numeric month values.
 
-# Precipitation conversion ----
+# 3.1 Merge 3 datasets ----
+
+Merged_data <- Discharge_clean %>%
+  left_join(Precipitation_clean, by = "Date")
+
+# Change Evapotranspiration_clean to a character to match with other data sets
+Evapotranspiration_clean$Date <- as.character(Evapotranspiration_clean$Date)
+
+Final_merged_data <- Merged_data %>%
+  left_join(Evapotranspiration_clean, by = "Date")
+
+# 3.2 Filter to 2015-2017 ----
+
+# Filter for dates within the range
+Filtered_data <- Final_merged_data %>% filter(Date >= as.Date("2015-01-01") & Date <= as.Date("2017-12-31"))
+
+# 3.3 Fix units ----
+
+# Precipitation conversion
 
 # First, we need Precipitation to be in metres
 # mm ----> m
 # To do this, we just need to divide by 1000. 
 
 # Convert "Rainfall" from mm to meters (creating a new column)
-Precipitation_clean$Precipitation_m <- Precipitation_clean$Precipitation_mm / 1000
+Filtered_data$Precipitation_m <- Filtered_data$Precipitation_mm / 1000
 # Not working, check type
 
-str(Precipitation_clean$Precipitation_m) # Character
+str(Filtered_data$Precipitation_m) # Character
 
-Precipitation_clean$Precipitation_mm <- as.numeric(Precipitation_clean$Precipitation_mm) # Change to numeric
+Filtered_data$Precipitation_mm <- as.numeric(Filtered_data$Precipitation_mm) # Change to numeric
 
 # Try again
-Precipitation_clean$Precipitation_m <- Precipitation_clean$Precipitation_mm / 1000
+Filtered_data$Precipitation_m <- Filtered_data$Precipitation_mm / 1000
 
-Precipitation_clean <- Precipitation_clean %>%
-  group_by(Month,Year) %>%
-  mutate(sum(Precipitation_m))
+# Now we only want one precipitation value each month, so we need to sum each month up:
+Filtered_data <- Filtered_data %>%
+  group_by(Year, MM) %>%
+  mutate(Monthly_precipitation_m = sum(Precipitation_m))
 
-# Discharge luckily came in the correct units = m3/s (cubic metres per second)
+# Daily flow luckily came in the correct units = m3/s (cubic metres per second)
 # But we only want one summed discharge value for the whole month!
 # So lets first get each discharge per day instead of per secs then add up all the days to get a sum of the month!
 
-days_in_month <- function(month, year) {
-  if (month %in% c(1, 3, 5, 7, 8, 10, 12)) {  # 31 days months
-    return(31)
-  } else if (month == 2) {  # February (check for leap year)
-    if (year %% 4 == 0 && (year %% 100 != 0 || year %% 400 == 0)) {  # Leap year
-      return(29)
-    } else {  # Non-leap year
-      return(28)
-    }
-  } else {  # 30 days months
-    return(30)
-  }
-}
+# Remember to change Daily flow m3/s to numeric NOT character. 
+Filtered_data$Daily_flow_m3pers <- as.numeric(Filtered_data$Daily_flow_m3pers)
 
-Discharge_clean <- Discharge_clean %>%
+# Times each Daily flow by the number of seconds in a day (86400) then by days in the month. 
+Filtered_data <- Filtered_data %>%
+  group_by(Year, DD) %>%
+  mutate(Daily_flow_m3 = Daily_flow_m3pers * 86400) %>%
+  ungroup() %>%
+  group_by(Year, MM) %>%
+  mutate(Monthly_flow_m3 = sum(Daily_flow_m3)) %>%
+  ungroup() 
+
+# Set Month and year to a factor with the correct order
+Filtered_data <- Filtered_data %>%
   mutate(
-    Year = as.numeric(format(Date, "%Y")),  # Extract year
-    Month = as.numeric(format(Date, "%m"))  # Extract month
-  ) %>%
-  group_by(Year, Month) %>%
-  mutate(
-    days_in_this_month = mapply(days_in_month, Month, Year),  # Get the number of days in this month
-    daily_discharge_m3 = Discharge_m3pers * 86400) %>%
-  ungroup()
+    MM = factor(
+      MM,
+      levels = month.abb  # Levels set to the correct order (Jan, Feb, ..., Dec)
+    ),
+    Year = as.factor(Year)
+  )
 
-Discharge_clean$daily_discharge_m3 <- as.numeric(Discharge_clean$daily_discharge_m3)
+Data <- Filtered_data
 
-str(Discharge_clean$daily_discharge_m3)
-
-# Dont worry about evapotranspiration right now!
-
-# ---- Merge 3 datasets ----
-
-merged_data <- Discharge_clean %>%
-  left_join(Precipitation_clean, by = "Date")
-
-final_merged_data <- merged_data %>%
-  left_join(Evapotranspiration_clean, by = "Date")
-
-# Check the format of the Date column in both datasets
-str(merged_data$Date)
-str(Evapotranspiration_clean$Date)
-
-# Change Evapotranspiration_clean to a character to match with other data sets
-Evapotranspiration_clean$Date <- as.character(Evapotranspiration_clean$Date)
-
-# Try again
-final_merged_data <- merged_data %>%
-  left_join(Evapotranspiration_clean, by = "Date")
-
-# ---- Filter to 2015-2017 ----
-
-# Filter for dates within the range
-filtered_data <- final_merged_data %>% filter(Date >= as.Date("2015-01-01") & Date <= as.Date("2017-12-31"))
-
-# Didnt work because of NA
-
-# Remove columns with missing or empty names
-final_merged_data <- final_merged_data[, !is.na(colnames(final_merged_data)) & colnames(final_merged_data) != ""]
-
-# Again!
-filtered_data <- final_merged_data %>% filter(Date >= as.Date("2015-01-01") & Date <= as.Date("2017-12-31"))
-
-Data <- filtered_data
-
-# ---- Create a new column "Month" and "Year" ----
-
-# Now lets create a new column called month which makes it easier to assign parameters monthly/seasonally
-
-# Convert Date column to Date format if it isn't already
-
-Data$Date <- as.Date(Data$Date) # Make sure column date is in right format called date
-
-Data <- Data %>%
-  mutate(Month = format(Date, "%b"))  # Extracts abbreviated month names (e.g., "Jan", "Feb", etc.)
-
-Data$Year <- format(as.Date(Data$Date), "%Y") # New Year column to help group. 
-
-# Move new month column next to date column
-Data <- Data %>%
-  select(Date, Month, Year, everything()) 
-
-# Month is currently a categorical variable in alphabetical order so need to set to a factor. 
-Data <- Data %>%
-  mutate(Month = factor(format(Date, "%b"), 
-                        levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")))
-
-Data <- Data %>%
-  group_by(Month,Year) %>%
-  mutate(sum(Precipitation_m))
-
-
-
-# ---- CHANGING DISCHARGE UNITS ----
-
-# Discharge luckily came in the correct units = m3/s (cubic metres per second)
-# But we only want one summed discharge value for the whole month!
-# So lets first get each discharge per day instead of per secs then add up all the days to get a sum of the month!
-
-days_in_month <- function(month, year) {
-  if (month %in% c(1, 3, 5, 7, 8, 10, 12)) {  # 31 days months
-    return(31)
-  } else if (month == 2) {  # February (check for leap year)
-    if (year %% 4 == 0 && (year %% 100 != 0 || year %% 400 == 0)) {  # Leap year
-      return(29)
-    } else {  # Non-leap year
-      return(28)
-    }
-  } else {  # 30 days months
-    return(30)
-  }
-}
-
-Data <- Data %>%
-  mutate(
-    Year = as.numeric(format(Date, "%Y")),  # Extract year
-    Month = as.numeric(format(Date, "%m"))  # Extract month
-  ) %>%
-  group_by(Year, Month) %>%
-  mutate(
-    days_in_this_month = mapply(days_in_month, Month, Year),  # Get the number of days in this month
-    daily_discharge_m3 = Discharge_m3pers * 86400,  # Convert m3/s to m3/day (multiply by seconds in a day)
-    total_monthly_discharge = sum(daily_discharge_m3) # Multiply by the number of days in the month
-  ) %>%
-  ungroup()
-
-
-# ---- OBSERVED VALUES ----
+# 4 ---- OBSERVED VALUES ----
 
 # Lets calculate these, to get a jist of what were aiming for. 
 
-Data$Discharge_m3pers <- as.numeric(as.character(Data$Discharge_m3pers)) # Ensure Discharge is numeric
-
-Observed <- Data %>%
-  select(Month, Year, Date, Discharge_m3pers, daily_discharge_m3, total_monthly_discharge) %>%
-  group_by(Year, Month) %>%  # Group by both Year and Month
-  mutate(OBSERVED_meanflow = total_monthly_discharge / (31*24*60*60)) %>%
+Data <- Data %>%
+  group_by(Year, MM) %>%  # Group by both Year and Month
+  mutate(Observed_flow = Monthly_flow_m3 / (31*24*60*60)) %>%
   ungroup()
 
-
-# ---- Rainfall-Runoff Model ----
-
-# PARAMETERS!! ----
+# 5 ---- PARAMETERS ----
 
 
-# L1 ----
+# 5.1 Loss term 1 (L1) ----
 
 # L1 = Amount of water that reaches the surface AFTER interception, AFTER evapotranspiration!!! 
 # 0.2 means 20% of water reaches the surface. 
 # 0.6 means 60% of water reaches the surface.
 
 # But hang on, its gonna differ seasonally. 
+# Lets look at Et levels throughout the years 
 
-# Lets look at evapotrasnpiration levels throughout the years 
-
-Rainfall_Runoff_Model <- Data
-
-# Month is currently a categorical variable in alphabetical order so need to set to a factor. 
-Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
-  mutate(Month = factor(format(Date, "%b"), 
-                        levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")))
-
-
-# New year column
-Rainfall_Runoff_Model$Year <- format(as.Date(Rainfall_Runoff_Model$Date), "%Y") # New Year column to help group. 
-
-
-ggplot(Rainfall_Runoff_Model, aes(x = Month, y = Evapotranspiration_mm, color = Year, group = Year)) + 
+ggplot(Data, aes(x = MM, y = Et_mm, color = Year, group = Year)) + 
   geom_point() +
-  labs(title = "Evapotranspiration Levels by Year", 
+  labs(title = "Et Levels 2015-2017", 
        x = "Month", 
        y = "Evapotranspiration (mm)") +
-  scale_color_viridis_d() +  # Optional: Use a colorblind-friendly palette
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
@@ -278,8 +173,6 @@ ggplot(Rainfall_Runoff_Model, aes(x = Month, y = Evapotranspiration_mm, color = 
 
 # These 2 factors (Et and interception) help us decide a loss parameter for the model called L1. 
 
-# L1 
-
 # Based on the Et graph, we may choose to separate into seasons. 
 
 # So Nov-March = Little Et, little interception by urban/woodland therefore we may expect a large amount of rainfall to reach the surface. 
@@ -290,9 +183,7 @@ ggplot(Rainfall_Runoff_Model, aes(x = Month, y = Evapotranspiration_mm, color = 
 
 # And for June to July with v v v high Et, a parameter of 0.2 makes sense. 
 
-# C1 ----
-
-# SURFACE --> CHANNEL 
+# 5.2 Surface to Channel (C1) ----
 
 # Topography, soil type - permeable, impermeable? 
 
@@ -304,21 +195,17 @@ ggplot(Rainfall_Runoff_Model, aes(x = Month, y = Evapotranspiration_mm, color = 
 
 # 0.6 = 60% of water goes straight to channel.
 
-# C2 ----
-
-# SURFACE --> GROUND
+# 5.3 Surface to ground (C2) ----
 
 # Low permeability
 
 # 0.3
 
-# C3 ----
-
-# GROUND ---> CHANNEL
+# 5.4 Ground to channel (C3) ----
 
 # 0.55
 
-# L2 ----
+# 5.5 Loss term 2 (L2) ----
 
 # How much leakage occurs? 
 
@@ -326,87 +213,209 @@ ggplot(Rainfall_Runoff_Model, aes(x = Month, y = Evapotranspiration_mm, color = 
 
 # But lets just say 20% for now. 
 
-# BUILDING THE MODEL ----
+# 6 ---- BUILDING THE MODEL ----
 
-# ---- INITIAL SURFACE STORAGE (CU/M)
-
-# This is the amount of water held in the surface storage from previous months. For Jan, lets just start it on 0. 
+library(dplyr)
 
 Rainfall_Runoff_Model <- Data %>%
-  mutate(Initial_surface_storage = ifelse(format(Date, "%m") == "01", 0, NA))
+  
+  # Select relevant columns
+  select(Year, MM, DD, Monthly_precipitation_m, Observed_flow) %>%
+  
+  # Group by Year
+  group_by(Year) %>%
+  
+  # Apply the calculations
+  mutate(
+    # Area constant
+    Area = 694,
+    
+    # Total water input (m³)
+    Total_water_input = Monthly_precipitation_m * Area * 1000000,  # Convert km² to m²
+    
+    # Constants
+    C1 = 0.6,
+    C2 = 0.3,
+    C3 = 0.55
+  ) %>%
+  
+  # For January, set Initial Surface Storage to 0
+  mutate(
+    Initial_surface_storage = if_else(MM == "Jan", 0, lag(Surface_storage, default = 0))
+  ) %>%
+  
+  # Sequential calculation for Surface_storage (using lag to carry over values from the previous month)
+  mutate(
+    Surface_storage = if_else(MM == "Jan", 0, lag(Surface_storage, default = 0) * (1 - (C1 + C2)) + Total_water_input * 0.8),
+    
+    # Surface to channel
+    Surface_to_channel = C1 * Surface_storage,
+    
+    # Surface to ground
+    Surface_to_ground = C2 * Surface_storage
+  ) %>%
+  
+  # Sequential calculation for Ground_storage
+  mutate(
+    Ground_storage = if_else(MM == "Jan", 0, lag(Ground_storage, default = 0) + Surface_to_ground * 0.2),
+    
+    # Ground to channel
+    Ground_to_channel = C3 * Ground_storage,
+    
+    # Predicted channel input (sum of surface and ground to channel)
+    Pred_channel_input = Surface_to_channel + Ground_to_channel,
+    
+    # Predicted mean channel discharge (divide by seconds in the month)
+    Pred_mean_channel_discharge = Pred_channel_input / (31 * 24 * 60 * 60)  # Seconds in a month
+  ) %>%
+  
+  # Ungroup after calculations
+  ungroup()
 
-# ---- RAINFALL
+# View the final output
+print(Rainfall_Runoff_Model)
 
-Precipitation_m <- Precipitation_clean$Precipitation_m # We already have this! 
 
-# ---- AREA 
 
-Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
-  mutate(Area = 694) #km2
+# Start with January first. Because we cant get feb values until we have Jan and so on...
 
-# ---- TOTAL WATER INPUT
 
-# This is the total water across the whole area.
 
-Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
-  mutate(Total_water_input = Precipitation_m * Area * 1000000) # 1million because km2 --> m2 
+# JANUARY *****
 
-# ---- SURFACE STORAGE 
+Rainfall_Runoff_Model <- Data %>%
+  
+  # Select years from Data that we need
+  select(Year, MM, DD, Monthly_precipitation_m, Observed_flow) %>%
+  
+  # 6.1 INITIAL SURFACE STORAGE (CU/M)  
+  mutate(Initial_surface_storage = if_else(MM == "Jan", 0, NA_real_),
 
-# Initial surface storage PLUS our parameter L1 and times the total water input.
+         # 6.3 AREA (KM2)
+         Area = 694,
+         
+         # 6.4 TOTAL WATER INPUT 
+         # This is the total water across the whole area.
 
-Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
-  mutate(Surface_storage = Initial_surface_storage + 0.8 * Total_water_input) # Only for Jan. 
+         Total_water_input = Monthly_precipitation_m * Area * 1000000, # 1million because km2 --> m2 
 
-# ---- C1, C2 + C3
+         # 6.4 SURFACE STORAGE 
+         # Initial surface storage PLUS our parameter L1 and times the total water input.
+         
+         Surface_storage = Initial_surface_storage + 0.8 * Total_water_input, # Only for Jan. 
 
-Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
-  mutate(C1 = 0.6,
+         # 6.5 C1, C2 + C3
+
+         C1 = 0.6,
          C2 = 0.3,
-         C3 = 0.55)
-
-# ---- REMAINS
-
-Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
-  mutate(Surface_to_channel = C1 * Surface_storage, # to channel
-         Surface_to_ground = C2 * Surface_storage, # to ground
+         C3 = 0.55,
+         
+         # 6.5 SURFACE TO CHANNEL
+         Surface_to_channel = C1 * Surface_storage,
+         
+         # 6.6 SURFACE TO GROUND
+         Surface_to_ground = C2 * Surface_storage, 
+         
+         # 6.7 INITIAL GROUND STORAGE
          Initial_ground_storage = 0, #0 for Jan
-         Ground_storage = Initial_surface_storage + 0.2 * Surface_to_ground, # 0.2 = L2 parameter
-         Ground_to_channel = C3 * Ground_storage)
-
-# ---- PREDICTED
-
-Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
-  mutate(Pred_channel_input = Surface_to_channel + Ground_to_channel,
+         
+         # 6.8 GROUND STORAGE 
+         Ground_storage = if_else(MM == "Jan", 0, lag(Ground_storage, default = 0) + Surface_to_ground * 0.2),
+         
+         # 6.9 GROUND TO CHANNEL
+         Ground_to_channel = C3 * Ground_storage,
+         
+         # 7 PREDICTED VALUES ----
+         # Predicted channel input
+         Pred_channel_input = Surface_to_channel + Ground_to_channel,
+         
+         # Use pred channel input to calculate pred mean channel discharge, our final value! 
          Pred_mean_channel_discharge = Pred_channel_input / (31*24*60*60))
 
-# ---- OBSERVED/REALITY
+# Perfect now we have January we can use this same template to apply it to the rest of the year. 
+
+# REST OF YEAR *****
 
 Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
-  left_join(x = Rainfall_Runoff_Model, y = Observed, by = "Date")
+  
+  # 6.1 INITIAL SURFACE STORAGE (CU/M)  
+  # This is the amount of water held in the surface storage from previous months. 
+  # To calculate this we add C1 AND C2 together to get x 
+  # Then 1-x *100 = initial surface storage 
+  mutate(
+    # Initialize surface storage
+    
+    # Calculate leftover percentage for months other than January
+    Initial_surface_storage = if_else(
+      MM != "01",
+      lag(Surface_storage) * (1 - (C1 + C2)),  # Use previous month's surface storage
+      Initial_surface_storage,  # Keep 0 for January
+  
+         # 6.3 AREA (KM2)
+         Area = 694,
+         
+         # 6.4 TOTAL WATER INPUT 
+         # This is the total water across the whole area.
+         
+         Total_water_input = Monthly_precipitation_m * Area * 1000000, # 1million because km2 --> m2 
+         
+         # 6.4 SURFACE STORAGE 
+         # Initial surface storage PLUS our parameter L1 and times the total water input.
+         
+         Surface_storage = if_else(MM == "Jan", 0, lag(Surface_storage, default = 0) * (1 - (C1 + C2)) + Total_water_input * 0.8),
+         
+         # 6.5 C1, C2 + C3
+         
+         C1 = 0.6,
+         C2 = 0.3,
+         C3 = 0.55,
+         
+         # 6.5 SURFACE TO CHANNEL
+         Surface_to_channel = C1 * Surface_storage,
+         
+         # 6.6 SURFACE TO GROUND
+         Surface_to_ground = C2 * Surface_storage, 
+         
+         # 6.7 INITIAL GROUND STORAGE
+         Initial_ground_storage = 0, #0 for Jan
+         
+         # 6.8 GROUND STORAGE 
+         Ground_storage = Initial_surface_storage + 0.2 * Surface_to_ground, # 0.2 = L2 parameter
+         
+         # 6.9 GROUND TO CHANNEL
+         Ground_to_channel = C3 * Ground_storage,
+         
+         # 7 PREDICTED VALUES ----
+         # Predicted channel input
+         Pred_channel_input = Surface_to_channel + Ground_to_channel,
+         
+         # Use pred channel input to calculate pred mean channel discharge, our final value! 
+         Pred_mean_channel_discharge = Pred_channel_input / (31*24*60*60))
 
-Plot <- Rainfall_Runoff_Model %>%
-  select(Date, Year.x, Month.x, Pred_mean_channel_discharge, Observed_meanflow)
+# Perfect now we have January we can use this same template to apply it to the rest of the year. 
 
 
 
-# Visualise
+# 8 ---- Time to compare ----
 
-# Plotting both predicted and observed discharge over time
-ggplot(Rainfall_Runoff_Model, aes(x = Year.x)) +
-  # Plot for observed discharge
-  geom_point(aes(y = Observed_meanflow, color = "Observed"), size = 1) +
-  # Plot for predicted discharge
-  geom_line(aes(y = Pred_mean_channel_discharge, color = "Predicted"), size = 1) +
-  # Add labels and title
+ggplot(Rainfall_Runoff_Model, aes(x = MM)) + 
+  geom_line(aes(y = Observed_flow, color = "Observed Flow"), size = 1) +  # Observed
+  geom_line(aes(y = Pred_mean_channel_discharge, color = "Predicted Flow"), size = 1, linetype = "dashed") +  # Predicted
+  facet_wrap(~ Year, scales = "free_y") +  # Optional: Separate facets for each year
+  scale_color_manual(values = c("Observed Flow" = "blue", "Predicted Flow" = "red")) +  # Custom colors
   labs(
-    title = "Observed vs Predicted Mean Channel Discharge",
-    x = "Year",
-    y = "Mean Channel Discharge (m³/s)",
+    title = "Comparison of Observed and Predicted Flow (2015–2017)",
+    x = "Month",
+    y = "Flow (m³/s)",
     color = "Legend"
   ) +
-  # Customize the theme
   theme_minimal() +
-  # Adjust the colors and style
-  scale_color_manual(values = c("Observed" = "blue", "Predicted" = "red"))
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels
+    plot.title = element_text(hjust = 0.5),  # Center-align title
+    legend.position = "top"  # Position legend above the plot
+  )
+
+
+
 
