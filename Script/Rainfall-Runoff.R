@@ -9,7 +9,6 @@ library(ggplot2)
 library(tidyr)
 library(tidyverse)
 library(lubridate)
-library(purrr)
 
 # 2. ---- Load data ----
 
@@ -215,71 +214,7 @@ ggplot(Data, aes(x = MM, y = Et_mm, color = Year, group = Year)) +
 
 # 6 ---- BUILDING THE MODEL ----
 
-library(dplyr)
-
-Rainfall_Runoff_Model <- Data %>%
-  
-  # Select relevant columns
-  select(Year, MM, DD, Monthly_precipitation_m, Observed_flow) %>%
-  
-  # Group by Year
-  group_by(Year) %>%
-  
-  # Apply the calculations
-  mutate(
-    # Area constant
-    Area = 694,
-    
-    # Total water input (m³)
-    Total_water_input = Monthly_precipitation_m * Area * 1000000,  # Convert km² to m²
-    
-    # Constants
-    C1 = 0.6,
-    C2 = 0.3,
-    C3 = 0.55
-  ) %>%
-  
-  # For January, set Initial Surface Storage to 0
-  mutate(
-    Initial_surface_storage = if_else(MM == "Jan", 0, lag(Surface_storage, default = 0))
-  ) %>%
-  
-  # Sequential calculation for Surface_storage (using lag to carry over values from the previous month)
-  mutate(
-    Surface_storage = if_else(MM == "Jan", 0, lag(Surface_storage, default = 0) * (1 - (C1 + C2)) + Total_water_input * 0.8),
-    
-    # Surface to channel
-    Surface_to_channel = C1 * Surface_storage,
-    
-    # Surface to ground
-    Surface_to_ground = C2 * Surface_storage
-  ) %>%
-  
-  # Sequential calculation for Ground_storage
-  mutate(
-    Ground_storage = if_else(MM == "Jan", 0, lag(Ground_storage, default = 0) + Surface_to_ground * 0.2),
-    
-    # Ground to channel
-    Ground_to_channel = C3 * Ground_storage,
-    
-    # Predicted channel input (sum of surface and ground to channel)
-    Pred_channel_input = Surface_to_channel + Ground_to_channel,
-    
-    # Predicted mean channel discharge (divide by seconds in the month)
-    Pred_mean_channel_discharge = Pred_channel_input / (31 * 24 * 60 * 60)  # Seconds in a month
-  ) %>%
-  
-  # Ungroup after calculations
-  ungroup()
-
-# View the final output
-print(Rainfall_Runoff_Model)
-
-
-
 # Start with January first. Because we cant get feb values until we have Jan and so on...
-
-
 
 # JANUARY *****
 
@@ -288,111 +223,76 @@ Rainfall_Runoff_Model <- Data %>%
   # Select years from Data that we need
   select(Year, MM, DD, Monthly_precipitation_m, Observed_flow) %>%
   
-  # 6.1 INITIAL SURFACE STORAGE (CU/M)  
-  mutate(Initial_surface_storage = if_else(MM == "Jan", 0, NA_real_),
-
-         # 6.3 AREA (KM2)
-         Area = 694,
-         
-         # 6.4 TOTAL WATER INPUT 
-         # This is the total water across the whole area.
-
-         Total_water_input = Monthly_precipitation_m * Area * 1000000, # 1million because km2 --> m2 
-
-         # 6.4 SURFACE STORAGE 
-         # Initial surface storage PLUS our parameter L1 and times the total water input.
-         
-         Surface_storage = Initial_surface_storage + 0.8 * Total_water_input, # Only for Jan. 
-
-         # 6.5 C1, C2 + C3
-
-         C1 = 0.6,
-         C2 = 0.3,
-         C3 = 0.55,
-         
-         # 6.5 SURFACE TO CHANNEL
-         Surface_to_channel = C1 * Surface_storage,
-         
-         # 6.6 SURFACE TO GROUND
-         Surface_to_ground = C2 * Surface_storage, 
-         
-         # 6.7 INITIAL GROUND STORAGE
-         Initial_ground_storage = 0, #0 for Jan
-         
-         # 6.8 GROUND STORAGE 
-         Ground_storage = if_else(MM == "Jan", 0, lag(Ground_storage, default = 0) + Surface_to_ground * 0.2),
-         
-         # 6.9 GROUND TO CHANNEL
-         Ground_to_channel = C3 * Ground_storage,
-         
-         # 7 PREDICTED VALUES ----
-         # Predicted channel input
-         Pred_channel_input = Surface_to_channel + Ground_to_channel,
-         
-         # Use pred channel input to calculate pred mean channel discharge, our final value! 
-         Pred_mean_channel_discharge = Pred_channel_input / (31*24*60*60))
-
-# Perfect now we have January we can use this same template to apply it to the rest of the year. 
+  # 6.1 SET INITIAL SURFACE AND GROUND STORAGE (CU/M) TO 0 FOR JAN
+  mutate(
+    Initial_surface_storage = if_else(MM == "Jan", 0, NA_real_),
+    Initial_ground_storage = if_else(MM == "Jan", 0, NA_real_),
+    
+    # 6.3 AREA (KM2)
+    Area = 694,
+    
+    # 6.4 TOTAL WATER INPUT 
+    # This is the total water across the whole area.
+    
+    Total_water_input = Monthly_precipitation_m * Area * 1000000, # 1million because km2 --> m2 
+    
+    # 6.4 SURFACE STORAGE 
+    # Initial surface storage PLUS our parameter L1 and times the total water input.
+    
+    Surface_storage = Initial_surface_storage + 0.8 * Total_water_input, # Only for Jan. 
+    
+    # 6.5 C1, C2 + C3
+    
+    C1 = 0.6,
+    C2 = 0.3,
+    C3 = 0.55,
+    L2 = 0.2,
+    
+    # 6.5 SURFACE TO CHANNEL
+    Surface_to_channel = C1 * Surface_storage,
+    
+    # 6.6 SURFACE TO GROUND
+    Surface_to_ground = C2 * Surface_storage, 
+    
+    # 6.8 GROUND STORAGE 
+    Ground_storage = Initial_ground_storage + L2 + Surface_to_ground, 
+    
+    # 6.9 GROUND TO CHANNEL
+    Ground_to_channel = C3 * Ground_storage,
+    
+    # 7 PREDICTED VALUES ----
+    # Predicted channel input
+    Pred_channel_input = Surface_to_channel + Ground_to_channel,
+    
+    # Use pred channel input to calculate pred mean channel discharge, our final value! 
+    Pred_mean_channel_discharge = Pred_channel_input / (31*24*60*60))
 
 # REST OF YEAR *****
 
-Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
-  
-  # 6.1 INITIAL SURFACE STORAGE (CU/M)  
-  # This is the amount of water held in the surface storage from previous months. 
-  # To calculate this we add C1 AND C2 together to get x 
-  # Then 1-x *100 = initial surface storage 
-  mutate(
-    # Initialize surface storage
-    
-    # Calculate leftover percentage for months other than January
-    Initial_surface_storage = if_else(
-      MM != "01",
-      lag(Surface_storage) * (1 - (C1 + C2)),  # Use previous month's surface storage
-      Initial_surface_storage,  # Keep 0 for January
-  
-         # 6.3 AREA (KM2)
-         Area = 694,
-         
-         # 6.4 TOTAL WATER INPUT 
-         # This is the total water across the whole area.
-         
-         Total_water_input = Monthly_precipitation_m * Area * 1000000, # 1million because km2 --> m2 
-         
-         # 6.4 SURFACE STORAGE 
-         # Initial surface storage PLUS our parameter L1 and times the total water input.
-         
-         Surface_storage = if_else(MM == "Jan", 0, lag(Surface_storage, default = 0) * (1 - (C1 + C2)) + Total_water_input * 0.8),
-         
-         # 6.5 C1, C2 + C3
-         
-         C1 = 0.6,
-         C2 = 0.3,
-         C3 = 0.55,
-         
-         # 6.5 SURFACE TO CHANNEL
-         Surface_to_channel = C1 * Surface_storage,
-         
-         # 6.6 SURFACE TO GROUND
-         Surface_to_ground = C2 * Surface_storage, 
-         
-         # 6.7 INITIAL GROUND STORAGE
-         Initial_ground_storage = 0, #0 for Jan
-         
-         # 6.8 GROUND STORAGE 
-         Ground_storage = Initial_surface_storage + 0.2 * Surface_to_ground, # 0.2 = L2 parameter
-         
-         # 6.9 GROUND TO CHANNEL
-         Ground_to_channel = C3 * Ground_storage,
-         
-         # 7 PREDICTED VALUES ----
-         # Predicted channel input
-         Pred_channel_input = Surface_to_channel + Ground_to_channel,
-         
-         # Use pred channel input to calculate pred mean channel discharge, our final value! 
-         Pred_mean_channel_discharge = Pred_channel_input / (31*24*60*60))
+# Convert data to wide format
+Rainfall_Runoff_Model_Wide <- Rainfall_Runoff_Model %>%
+  pivot_wider(
+    names_from = MM,  # Make each month a column
+    values_from = c(Initial_surface_storage, Monthly_precipitation_m, Total_water_input, Surface_storage, Surface_to_channel, Surface_to_ground, Initial_ground_storage, Ground_storage, Ground_to_channel, Pred_channel_input, Pred_mean_channel_discharge)
+  )
 
-# Perfect now we have January we can use this same template to apply it to the rest of the year. 
+# Calculate Surface_storage row-wise
+Rainfall_Runoff_Model_Wide <- Rainfall_Runoff_Model_Wide %>%
+  mutate(
+    Left_over = (1 - (C1 + C2)) * 100,
+    Initial_surface_storage_Jan = 0,
+    Initial_surface_storage_Feb = Surface_storage_Jan / Left_over,
+    Surface_storage_Feb = Initial_surface_storage_Feb + 0.8 * Total_water_input_Feb,
+    Surface_to_channel_Feb = C1 * Surface_storage_Feb,
+    Surface_to_ground_Feb = C2 * Surface_storage_Feb,
+    Initial_ground_storage_Feb = Ground_storage_Jan - Ground_to_channel_Jan,
+    Ground_storage_Feb = Initial_ground_storage_Feb + L2 * Surface_to_ground_Feb,
+    Pred_channel_input_Feb = Surface_to_channel_Feb + Ground_to_channel_Feb,
+    Pred_mean_channel_discharge_Feb = Pred_channel_input_Feb / (28*24*60*60)
+  )
+
+    
+
 
 
 
