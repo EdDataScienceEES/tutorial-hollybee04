@@ -72,7 +72,7 @@ Open a new script, write a title, your name, the date and load in the packages a
 
 The UK Centre for Ecology and Hydrology (https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
 
-```
+```r
 # Tutorial: Understanding and Building a Rainfall-Runoff Model
 # Written by ...
 # Date 
@@ -106,7 +106,7 @@ Evapotranspiration <- get_power(
 ```
 If you were to pick a different catchment, you would download data specific to that area, including latitude and longitude values. I found these on google maps by matching up roughly where the rain guage was on CEH.
 
-```
+```r
 ---- Data preparation ----
 
 # Remove first 19 rows of metadata
