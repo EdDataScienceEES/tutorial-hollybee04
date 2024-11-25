@@ -1,6 +1,6 @@
 ---
 layout: tutorial 
-title: How to build a Rainfall-Runoff Model
+title: Understanding and Building a Rainfall-Runoff Model
 author: Holly Bacon
 date: 2024-11-23 00:00:00
 subtitle: Deciding parameters, visualising, calibrating and validating.
