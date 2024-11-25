@@ -62,7 +62,7 @@ Once validated, the model becomes a powerful resource. It can be used to predict
 {% include callout.html colour='callout' content=callout %}
 
 {% capture callout %}
-All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/ourcodingclub/CC-data-manip-advanced-dplyr" target="_blank" markdown="1">repository</a>. Click code, download the URL and paste in a new project in R Studio. 
+All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>. Click code, download the URL and paste in a new project in R Studio. 
 {% endcapture %}
 {% include callout.html colour='callout' content=callout %}
 
