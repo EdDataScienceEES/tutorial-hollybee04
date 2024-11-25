@@ -23,9 +23,11 @@ tags: Rainfall-Runoff, Hydrology, Calibration, Validation
 
 #### <a href="#section1"> 1. What is a Rainfall-Runoff Model?</a>
 
-#### <a href="#section2"> 2. Load in data</a>
+#### <a href="#section2"> Part 2. Data preparationa</a>
 
-#### <a href="#section3"> 3. The third section</a>
+#### <a href="#section3"> 2. Load packages</a>
+
+#### <a href="#section4"> 3. The third section</a>
 
 
 
@@ -67,11 +69,86 @@ All the files you need to complete this tutorial can be downloaded from this <a 
 {% include callout.html colour='callout' content=callout %}
 
 <a name="1"></a>
-### 2. Load in data 
+### Part 2. Data preparation  
+
+Open a new script, write a title, your name, the date and load in the packages and data. Throughout this tutorial you can copy the code boxes into your own script. Remember # give extra context and explain what the code is doing! 
 
 The UK Centre for Ecology and Hydrology (https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
 
+```
+# Tutorial: Understanding and Building a Rainfall-Runoff Model
+# Written by ...
+# Date 
 
+---- Library ----
+
+library(nasapower) # for downloading evapotranspiration data 
+library(dplyr) # for data manipulation
+library(ggplot2) # for data visualisation
+library(lubridate) # for data handling
+
+---- Load data ----
+
+Flow <- read.csv("data/Daily_flow.csv")
+Precipitation <- read.csv("data/Rainfall_Data.csv")
+
+# Download Et data from NASA! (nasapower)
+
+# Set coordinates for the Tweed catchment.
+
+Latitude <- 55.647
+Longitude <- -3.179
+
+Evapotranspiration <- get_power(
+  community = "AG", # AG = agriculture
+  pars = "EVPTRNS",  # Evapotranspiration
+  lonlat = c(longitude, latitude),
+  temporal_api = "daily",
+  dates = c("2015-01-01", "2017-12-31") # Data range. We are choosing to base the model on these 3 years but you could do different years or for a longer time. 
+) 
+```
+If you were to pick a different catchment, you would download data specific to that area, including latitude and longitude values. I found these on google maps by matching up roughly where the rain guage was on CEH.
+
+```
+---- Data preparation ----
+
+# Remove first 19 rows of metadata
+
+Flow_clean <- Flow[20:nrow(Flow), ] # This excludes the first 19 rows and only rows 20 and on are kept in the new data frame "Flow_clean".
+
+Precipitation_clean <- Precipitation[20:nrow(Precipitation), ]
+
+# Name the new columns
+
+colnames(Flow_clean) <- c("Date", "Daily_flow_m3pers") # CEH states the daily flow data is recorded in m3/s.
+
+colnames(Precipitation_clean) <- c("Date", "Precipitation_mm")
+
+# Select necessary columns
+
+Flow_clean <- Flow_clean %>%
+  select(Date, Daily_flow_m3pers )
+
+Precipitation_clean <- Precipitation_clean %>%
+  select(Date, Precipitation_mm )
+
+Evapotranspiration_clean <- Evapotranspiration %>%
+  select(YEAR, MM, DD, DOY, YYYYMMDD, EVPTRNS)
+
+# Name Et columns 
+
+colnames(Evapotranspiration_clean) <- c("Year", "MM", "DD", "DOY", "Date", "Et_mm")
+
+Evapotranspiration_clean$MM <- month.abb[Evapotranspiration_clean$MM] # Change to names instead of numeric month values. "month.abb" = 3 letter abreviations for the months.
+```
+
+Great! Now we have all the data we need and it's pretty organised now. But it's all seperate. Lets combine the 3 datasets together using a cool `dplyr` function called `left_join` 
+
+{% capture callout %}
+Why I love `left_join()`: 
+It's really easy to use and allows you to combine data sets together, but specifically when you want to keep the rows from the left data frame and add matching values from the right data frame. Where values don't match, an NA will appear. This is useful when you have collected data on multiple different variables and so you have may have separate data frames.
+{% endcapture %}
+{% include callout.html colour='callout' content=callout %}
 
 
 The parameters are decided based on typical characteristics of your chosen catchment (In this tutorial, we'll be looking at the Tweed at Peebles catchment). Characteristics include:
