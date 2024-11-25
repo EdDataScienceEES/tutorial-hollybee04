@@ -11,17 +11,76 @@ tags: Rainfall-Runoff, Hydrology, Calibration, Validation
   <img src="Figures/Tut_title.png" width="1000" height="400">
 </div>
 
+*Created by Holly Bacon*
 
+## Tutorial Aims:
 
-To add images, replace `tutheaderbl1.png` with the file name of any image you upload to your GitHub repository.
+1. Learn the importance of Rainfall-Runoff models, what they do and why we need them.
+2. Understand how we decide model parameters.
+3. Become confident in creating a Rainfall-Runoff model that can accurately predict flow values that match up with real values.
 
-### Tutorial Aims
+## Tutorial Steps:
 
-#### <a href="#section1"> 1. The first section</a>
+#### <a href="#section1"> 1. What is a Rainfall-Runoff Model?</a>
 
-#### <a href="#section2"> 2. The second section</a>
+#### <a href="#section2"> 2. Load in data</a>
 
 #### <a href="#section3"> 3. The third section</a>
+
+
+
+<a name="1"></a>
+### 1. What is a Rainfall-Runoff model?
+
+Welcome! Here, you're going to learn the basis of creating a Rainfall-Runoff model. But, you might be wondering... okay but what is a Rainfall-Runoff model? If you're not familiar with this, that's okay. Let's go over it:
+
+Let's zoom right out and look at the Hydrological cycle. 
+
+<div style="text-align: center;">
+  <img src="Figures/Hydrologic_cycle.png" width="700" height="400">
+</div>
+
+Here, we can see precipitation enters the system and either:
+- runs straight to the channel (surface runoff),
+- infiltrates into the ground
+- or evapotranspires back up.
+
+So.. what if we created a model that could predict the average flow of water through a river each month in any year. 
+
+### WHY THOUGH?
+
+Runoff models aim to successfully track changes in water availability, floods and droughts over time (Jehanzaib et al, 2022). 
+
+For example, imagine you're a hydrologist studying a Scottish catchment. You have access to precipitation and daily flow data from 1970-now. Based on your understanding of the catchment characteristics - such as, soil type, topography, land cover, evapotranspiration - you can create a model that reflects the observed trends and patterns within this catchment. By adjusting parameters, such as infiltration rates, interception rates and surface runoff coefficients, you can fine-tune the model to mimic how the hydrological cycle behaves in the region.
+
+At the end, the model will provide a predicted flow, which can be plotted against the observed daily flow to see how well your model performs. Do the lines match up? Did it capture seasonal trends? If the lines match up, this means you've successfully created a Rainfall-Runoff model that captures the hydrological dynamics of your catchment. 
+
+Once validated, the model becomes a powerful resource. It can be used to predict future flow rates based on estimated precipitation levels, providing valuable insights for mitigating flood risks and improving water resource management. By simulating different scenarios, such as changes in land use or climate, hydrologists can use runoff models in decision-making and improve resilience to extreme climatic events.
+
+<a name="1"></a>
+### 2. Load in data 
+
+
+
+
+
+
+The parameters are decided based on typical characteristics of your chosen catchment (In this tutorial, we'll be looking at the Tweed at Peebles catchment). Characteristics include:
+- Topography - is your catchment pretty flat, steep hills, undulating terrain?
+- Soil type - permeable/impermeable? This affects how well precipitation infiltrates into the soil.
+- Evapotranspiration (Et) - More Et in summer means less precipitation reaching the surface, therefore less surface runoff.
+- Land cover - Woodland? Agriculture? Urban? Woodland = Higher interception, Higher Et? Urban = impermeable roads and pavements = more surface runoff.
+
+These are all factors you have to think about when deciding parameters. 
+
+
+
+
+
+
+
+
+
 
 You can read this text, then delete it and replace it with your text about your tutorial: what are the aims, what code do you need to achieve them?
 ---------------------------
