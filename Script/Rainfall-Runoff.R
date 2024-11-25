@@ -10,6 +10,7 @@ library(tidyr)
 library(tidyverse)
 library(lubridate)
 
+
 # 2. ---- Load data ----
 
 Discharge <- read.csv("data/Daily_Flow.csv")
@@ -75,7 +76,8 @@ Final_merged_data <- Merged_data %>%
 # 3.2 Filter to 2015-2017 ----
 
 # Filter for dates within the range
-Filtered_data <- Final_merged_data %>% filter(Date >= as.Date("2015-01-01") & Date <= as.Date("2017-12-31"))
+Filtered_data <- Final_merged_data %>% 
+  filter(Date >= as.Date("2015-01-01") & Date <= as.Date("2017-12-31"))
 
 # 3.3 Fix units ----
 
@@ -100,6 +102,7 @@ Filtered_data$Precipitation_m <- Filtered_data$Precipitation_mm / 1000
 Filtered_data <- Filtered_data %>%
   group_by(Year, MM) %>%
   mutate(Monthly_precipitation_m = sum(Precipitation_m))
+
 
 # Daily flow luckily came in the correct units = m3/s (cubic metres per second)
 # But we only want one summed discharge value for the whole month!
@@ -214,107 +217,101 @@ ggplot(Data, aes(x = MM, y = Et_mm, color = Year, group = Year)) +
 
 # 6 ---- BUILDING THE MODEL ----
 
-# Start with January first. Because we cant get feb values until we have Jan and so on...
+# Aggregate daily data into monthly data so we only have 1 row each month
+Monthly_data <- Data %>%
+  group_by(Year, MM) %>% # Group by Year and Month
+  summarize(
+    # Retain the first value for columns that don't vary within the month
+    Monthly_precipitation_m = first(Monthly_precipitation_m),
+    Observed_flow = first(Observed_flow),
+    .groups = "drop" # Ungroup after summarizing
+  )
 
-# JANUARY *****
-
-Rainfall_Runoff_Model <- Data %>%
-  
-  # Select years from Data that we need
-  select(Year, MM, DD, Monthly_precipitation_m, Observed_flow) %>%
-  
-  # 6.1 SET INITIAL SURFACE AND GROUND STORAGE (CU/M) TO 0 FOR JAN
+# Create columns of each stage in the model
+Rainfall_Runoff_Model <- Monthly_data %>%
   mutate(
-    Initial_surface_storage = if_else(MM == "Jan", 0, NA_real_),
-    Initial_ground_storage = if_else(MM == "Jan", 0, NA_real_),
-    
-    # 6.3 AREA (KM2)
     Area = 694,
-    
-    # 6.4 TOTAL WATER INPUT 
-    # This is the total water across the whole area.
-    
-    Total_water_input = Monthly_precipitation_m * Area * 1000000, # 1million because km2 --> m2 
-    
-    # 6.4 SURFACE STORAGE 
-    # Initial surface storage PLUS our parameter L1 and times the total water input.
-    
-    Surface_storage = Initial_surface_storage + 0.8 * Total_water_input, # Only for Jan. 
-    
-    # 6.5 C1, C2 + C3
-    
+    Initial_surface_storage = 0,
+    Initial_ground_storage = 0,
     C1 = 0.6,
     C2 = 0.3,
     C3 = 0.55,
     L2 = 0.2,
-    
-    # 6.5 SURFACE TO CHANNEL
-    Surface_to_channel = C1 * Surface_storage,
-    
-    # 6.6 SURFACE TO GROUND
-    Surface_to_ground = C2 * Surface_storage, 
-    
-    # 6.8 GROUND STORAGE 
-    Ground_storage = Initial_ground_storage + L2 + Surface_to_ground, 
-    
-    # 6.9 GROUND TO CHANNEL
-    Ground_to_channel = C3 * Ground_storage,
-    
-    # 7 PREDICTED VALUES ----
-    # Predicted channel input
-    Pred_channel_input = Surface_to_channel + Ground_to_channel,
-    
-    # Use pred channel input to calculate pred mean channel discharge, our final value! 
-    Pred_mean_channel_discharge = Pred_channel_input / (31*24*60*60))
-
-# REST OF YEAR *****
-
-# Convert data to wide format
-Rainfall_Runoff_Model_Wide <- Rainfall_Runoff_Model %>%
-  pivot_wider(
-    names_from = MM,  # Make each month a column
-    values_from = c(Initial_surface_storage, Monthly_precipitation_m, Total_water_input, Surface_storage, Surface_to_channel, Surface_to_ground, Initial_ground_storage, Ground_storage, Ground_to_channel, Pred_channel_input, Pred_mean_channel_discharge)
+    Surface_storage = NA,
+    Ground_storage = NA,
+    Surface_to_channel = NA,
+    Surface_to_ground = NA,
+    Ground_to_channel = NA,
+    Pred_channel_input = NA,
+    Pred_mean_channel_discharge = NA
   )
 
-# Calculate Surface_storage row-wise
-Rainfall_Runoff_Model_Wide <- Rainfall_Runoff_Model_Wide %>%
-  mutate(
-    Left_over = (1 - (C1 + C2)) * 100,
-    Initial_surface_storage_Jan = 0,
-    Initial_surface_storage_Feb = Surface_storage_Jan / Left_over,
-    Surface_storage_Feb = Initial_surface_storage_Feb + 0.8 * Total_water_input_Feb,
-    Surface_to_channel_Feb = C1 * Surface_storage_Feb,
-    Surface_to_ground_Feb = C2 * Surface_storage_Feb,
-    Initial_ground_storage_Feb = Ground_storage_Jan - Ground_to_channel_Jan,
-    Ground_storage_Feb = Initial_ground_storage_Feb + L2 * Surface_to_ground_Feb,
-    Pred_channel_input_Feb = Surface_to_channel_Feb + Ground_to_channel_Feb,
-    Pred_mean_channel_discharge_Feb = Pred_channel_input_Feb / (28*24*60*60)
-  )
-
-    
-
-
-
+# Iterate over months in the data
+for (i in 1:nrow(Rainfall_Runoff_Model)) {
+  
+  # Extract the current row
+  current_month <- Rainfall_Runoff_Model[i, ]
+  
+  # Calculate total water input
+  Total_water_input <- current_month$Monthly_precipitation_m * current_month$Area * 1000000
+  
+  # Calculate surface storage
+  Surface_storage <- current_month$Initial_surface_storage + 0.8 * Total_water_input
+  
+  # Calculate surface to channel and surface to ground
+  Surface_to_channel <- current_month$C1 * Surface_storage
+  Surface_to_ground <- current_month$C2 * Surface_storage
+  
+  # Calculate ground storage
+  Ground_storage <- current_month$Initial_ground_storage + current_month$L2 + Surface_to_ground
+  
+  # Calculate ground to channel
+  Ground_to_channel <- current_month$C3 * Ground_storage
+  
+  # Predicted channel input
+  Pred_channel_input <- Surface_to_channel + Ground_to_channel
+  
+  # Predicted mean channel discharge
+  Pred_mean_channel_discharge <- Pred_channel_input / (31 * 24 * 60 * 60)  # Assuming all months have 31 days
+  
+  # Update the values in the dataset
+  Rainfall_Runoff_Model$Surface_storage[i] <- Surface_storage
+  Rainfall_Runoff_Model$Ground_storage[i] <- Ground_storage
+  Rainfall_Runoff_Model$Surface_to_channel[i] <- Surface_to_channel
+  Rainfall_Runoff_Model$Surface_to_ground[i] <- Surface_to_ground
+  Rainfall_Runoff_Model$Ground_to_channel[i] <- Ground_to_channel
+  Rainfall_Runoff_Model$Pred_channel_input[i] <- Pred_channel_input
+  Rainfall_Runoff_Model$Pred_mean_channel_discharge[i] <- Pred_mean_channel_discharge
+  
+  # Update initial values for the next month, if it exists
+  if (i < nrow(Rainfall_Runoff_Model)) {
+    Rainfall_Runoff_Model$Initial_surface_storage[i + 1] <- Surface_storage * (1 - current_month$C1 - current_month$C2)
+    Rainfall_Runoff_Model$Initial_ground_storage[i + 1] <- Ground_storage - Ground_to_channel
+  }
+}
 
 # 8 ---- Time to compare ----
 
-ggplot(Rainfall_Runoff_Model, aes(x = MM)) + 
-  geom_line(aes(y = Observed_flow, color = "Observed Flow"), size = 1) +  # Observed
-  geom_line(aes(y = Pred_mean_channel_discharge, color = "Predicted Flow"), size = 1, linetype = "dashed") +  # Predicted
-  facet_wrap(~ Year, scales = "free_y") +  # Optional: Separate facets for each year
-  scale_color_manual(values = c("Observed Flow" = "blue", "Predicted Flow" = "red")) +  # Custom colors
+# Assuming 'Rainfall_Runoff_Model' has columns: Date, Rainfall, Runoff
+
+Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
+  # Create a 'Date' column with first day of each month
+  mutate(Date = seq(ymd("2015-01-01"), by = "month", length.out = nrow(Rainfall_Runoff_Model)))
+
+# PLOT!!!!!
+ggplot(Rainfall_Runoff_Model, aes(x = Date)) +
+  geom_line(aes(y = Pred_mean_channel_discharge, color = "Predicted mean channel discharge"), size = 1) +
+  geom_line(aes(y = Observed_flow, color = "Observed flow"), size = 1, linetype = "dashed") +
   labs(
-    title = "Comparison of Observed and Predicted Flow (2015–2017)",
-    x = "Month",
-    y = "Flow (m³/s)",
+    title = "Rainfall and Runoff Over Time",
+    x = "Date",
+    y = "Flow (m³)",
     color = "Legend"
   ) +
-  theme_minimal() +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotate x-axis labels
-    plot.title = element_text(hjust = 0.5),  # Center-align title
-    legend.position = "top"  # Position legend above the plot
-  )
+  scale_color_manual(values = c("Predicted mean channel discharge" = "blue", "Observed flow" = "red")) +
+  theme_minimal()
+
+# YAYYY
 
 
 
