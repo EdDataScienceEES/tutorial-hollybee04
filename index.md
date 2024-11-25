@@ -6,7 +6,12 @@ date: 2024-11-23 00:00:00
 subtitle: Deciding parameters, visualising, calibrating and validating.
 tags: Rainfall-Runoff, Hydrology, Calibration, Validation
 ---
-</div><center><img src="{{ site.baseurl }}/tutheaderbl.png" alt="Img"></center>
+
+<div style="text-align: center;">
+  <img src="Figures/Tut_title.png" width="1000" height="400">
+</div>
+
+
 
 To add images, replace `tutheaderbl1.png` with the file name of any image you upload to your GitHub repository.
 
