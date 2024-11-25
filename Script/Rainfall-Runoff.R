@@ -13,7 +13,7 @@ library(lubridate)
 
 # 2. ---- Load data ----
 
-Discharge <- read.csv("data/Daily_Flow.csv")
+Flow <- read.csv("data/Daily_Flow.csv")
 Precipitation <- read.csv("data/Rainfall_Data.csv")
 
 # Download evapotranspiration data from NASA!
@@ -37,19 +37,19 @@ Evapotranspiration <- get_power(
 
 # Remove first 19 rows of metadata
 
-Discharge_clean <- Discharge[20:nrow(Discharge), ]
+Flow_clean <- Flow[20:nrow(Flow), ]
 
 Precipitation_clean <- Precipitation[20:nrow(Precipitation), ]
 
 # Name them
 
-colnames(Discharge_clean) <- c("Date", "Daily_flow_m3pers") # m3/s
+colnames(Flow_clean) <- c("Date", "Daily_flow_m3pers") # m3/s
 
 colnames(Precipitation_clean) <- c("Date", "Precipitation_mm")
 
 # Select necessary columns
 
-Discharge_clean <- Discharge_clean %>%
+Flow_clean <- Flow_clean %>%
   select(Date, Daily_flow_m3pers )
 
 Precipitation_clean <- Precipitation_clean %>%
@@ -64,7 +64,7 @@ Evapotranspiration_clean$MM <- month.abb[Evapotranspiration_clean$MM] # Change t
 
 # 3.1 Merge 3 datasets ----
 
-Merged_data <- Discharge_clean %>%
+Merged_data <- Flow_clean %>%
   left_join(Precipitation_clean, by = "Date")
 
 # Change Evapotranspiration_clean to a character to match with other data sets
