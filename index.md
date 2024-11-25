@@ -57,10 +57,19 @@ At the end, the model will provide a predicted flow, which can be plotted agains
 
 Once validated, the model becomes a powerful resource. It can be used to predict future flow rates based on estimated precipitation levels, providing valuable insights for mitigating flood risks and improving water resource management. By simulating different scenarios, such as changes in land use or climate, hydrologists can use runoff models in decision-making and improve resilience to extreme climatic events.
 
+{% capture callout %} If you don't have much experience with R, you should check out some of the Coding Club tutorials such as, "Intro to R" (https://ourcodingclub.github.io/tutorials/intro-to-r/) to get a grip of the basics. This tutorial will also incorparate various functions from the `dplyr` package, therefore the "Basic data manipulation" tutorial (  ) will also be very useful if you've never used the `dplyr` package before.
+{% endcapture %}
+{% include callout.html colour='callout' content=callout %}
+
+{% capture callout %}
+All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/ourcodingclub/CC-data-manip-advanced-dplyr" target="_blank" markdown="1">repository</a>. Click code, download the URL and paste in a new project in R Studio. 
+{% endcapture %}
+{% include callout.html colour='callout' content=callout %}
+
 <a name="1"></a>
 ### 2. Load in data 
 
-
+The UK Centre for Ecology and Hydrology (https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
 
 
 
