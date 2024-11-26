@@ -6,7 +6,10 @@ date: 2024-26-11 10:00:00
 author: Holly Bacon
 tags: modelling    
 ---
-<center><img src="{{ site.baseurl }}/Tut_title.png" alt="Img"></center>
+<div class="block">
+	<center>
+		<img src="{{ site.baseurl }}/Figures/Tut_title.png" alt="Img">
+	</center>
 
 *Created by Holly Bacon* 
  
