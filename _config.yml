@@ -1,66 +1,26 @@
-# Exclude files from Jekyll build
-exclude:
-    - README.md
-    - LICENSE
-    - CNAME
-    - Gemfile
-    - Gemfile.lock
-    - vendor
+#Site settings
 
-# Installed gems
-plugins: 
-    - jekyll-target-blank
-    - jekyll-redirect-from
- 
-# Gem settings
-
-# Site settings
-encoding: utf-8
-lang: en-GB
 title: "Understanding and Building a Rainfall-Runoff Model"
-logo: "/assets/img/logos/logo_hex.svg"
-description: "A tutorial on hydrological modelling"
-baseurl: ""
-url: "https://eddatascienceees.github.io/tutorial-hollybee04/"
-repo: "https://github.com/EdDataScienceEES/tutorial-hollybee04.git"
-email: "s2345560@ed.ac.uk"
-google_analytics: UA-92956541-1
-css_inline: false 
+description: "A step-by-step tutorial on how to build your own Rainfall-Runoff Model"
+url: "https://eddatascienceees.github.io/tutorial-hollybee04/"#Your actual site URL
+baseurl: ""#Leave as empty unless you are using a subfolder
 markdown: kramdown
-highlighter: rouge
-kramdown:
-  syntax_highlighter: rouge
-  input: GFM
-  auto_ids: true 
+theme: jekyll-theme-slate #You can change this to another theme if desired
+theme: jekyll-theme-minimal #Optional: Another theme you can try
 
-# Favicons 
-favicons: 
-    16: '/assets/img/logos/logo_hex@16px.png'
-    32: '/assets/img/logos/logo_hex@32px.png'
-    64: '/assets/img/logos/logo_hex@64px.png'
-    128: '/assets/img/logos/logo_hex@128px.png'
-    256: '/assets/img/logos/logo_hex@256px.png'
-    512: '/assets/img/logos/logo_hex@512px.png'
-    1024: '/assets/img/logos/logo_hex@1024px.png'
+#Github Pages settings (optional)
+github_username: "hollybee04"#Replace with your GitHub username
 
-# Site navigation
-navigation_header:
-- title: Home
-  url: /
-- title: Tutorials
-  url: /tutorials.html
+#Exclude files
+exclude:
+- README.md
+- LICENSE
+- Gemfile
+- Gemfile.lock
+- vendor
 
-# Define collections
-collections:
-    tutorials:
-        output: true
-        permalink: /tutorials/:path/
-    course:
-        output: true
-        permalink: /course/:path/
-    DL:
-        output: true
-        permalink: /DL/:path/
-    posts:
-        output: true
-        permalink: /posts/:path/
+#Plugins
+plugins:
+- jekyll-target-blank
+- jekyll-redirect-from
+- jekyll-seo-tag
