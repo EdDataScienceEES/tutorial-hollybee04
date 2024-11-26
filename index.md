@@ -158,9 +158,7 @@ Final_merged_data <- Merged_data %>%
 
 HANG ON! Notice when you try to join Et on an error appears:
 
-<div style="text-align: center;">
-  <img src="Figures/Left_join_error.png" width="500" height="100">
-</div>
+
 
 This is because the date column in Flow and Precipitation (x$Date) is a character but the date column in Et is in 'date' form. This means we need to change the date column in Et to a character. 
 
