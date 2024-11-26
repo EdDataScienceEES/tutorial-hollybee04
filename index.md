@@ -23,7 +23,9 @@ subtitle: Deciding parameters, visualising, calibrating and validating.
 
 #### <a href="#section2"> Part 2. Data preparationa</a>
 
-#### <a href="#section3"> 2. Load packages</a>
+#### <a href="#section3"> 2.1 Install packages and load data</a>
+
+#### <a href="#section4"> 2.2 
 
 #### <a href="#section4"> 3. The third section</a>
 
@@ -47,7 +49,7 @@ Here, we can see precipitation enters the system and either:
 
 So.. what if we created a model that could predict the average flow of water through a river each month in any year. 
 
-### WHY THOUGH?
+### Why do we want to do this?
 
 Runoff models aim to successfully track changes in water availability, floods and droughts over time (Jehanzaib et al, 2022). 
 
@@ -136,12 +138,67 @@ colnames(Evapotranspiration_clean) <- c("Year", "MM", "DD", "DOY", "Date", "Et_m
 
 Evapotranspiration_clean$MM <- month.abb[Evapotranspiration_clean$MM] # Change to names instead of numeric month values. "month.abb" = 3 letter abreviations for the months.
 ```
+If you're confused what the pipes (`%>%`) are doing, head to the 'Efficient data manipulation' tutorial (https://ourcodingclub.github.io/tutorials/data-manip-efficient/) which introduces pipes. If you just need a quick reminder - pipes chain operations together in a more efficient and readable way! 
 
 Great! Now we have all the data we need and it's pretty organised now. But it's all seperate. Lets combine the 3 datasets together using a cool `dplyr` function called `left_join` 
 
 > **_TIP:_**
 Why I love `left_join()`: 
 It's really easy to use and allows you to combine data sets together, but specifically when you want to keep the rows from the left data frame and add matching values from the right data frame. Where values don't match, an NA will appear. This is useful when you have collected data on multiple different variables and so you have may have separate data frames.
+
+```r
+Merge 3 datasets ----
+
+# First merge flow and precipitation data together by matching dates 
+
+Merged_data <- Flow_clean %>%
+left_join(Precipitation_clean, by = "Date")
+# Merged_data now contains both flow and precipitation. Now lets join Et.
+
+Final_merged_data <- Merged_data %>%
+  left_join(Evapotranspiration_clean, by = "Date") # Doesn't work!
+```
+
+HANG ON! Notice when you try to join Et on an error appears:
+
+<div style="text-align: center;">
+  <img src="Figures/Left_join_error.png" width="500" height="100">
+</div>
+
+This is because the date column in Flow and Precipitation (x$Date) is a character but the date column in Et is in 'date' form. This means we need to change the date column in Et to a character. 
+
+```r
+# Change Evapotranspiration_clean to a character to match with other data sets
+Evapotranspiration_clean$Date <- as.character(Evapotranspiration_clean$Date)
+
+# Try again!
+Final_merged_data <- Merged_data %>%
+  left_join(Evapotranspiration_clean, by = "Date")
+```
+
+You can also use this when you need to change a column to a factor or numeric: as.factor, as.numeric. 
+
+OKAY! Now we have one big data set containing all the information we need. What's next?
+
+Now we need to filter to the years we want to calibrate our model with (2015-2017). We can do this by using the `filter()` function which selects rows based on the conditions we set. 
+
+```r
+# Filter to 2015-2017 ----
+
+# Filter for dates within the range
+Filtered_data <- Final_merged_data %>% 
+  filter(Date >= as.Date("2015-01-01") & Date <= as.Date("2017-12-31"))
+```
+
+- Condition 1: "Date >= as.Date("2015-01-01")" keeps rows where the Date column is greater than or equal to January 1st 2015. "as.Date" ensures date is treated as a date and not just text.
+- Condition 2: "Date <= as.Date("2017-12-31")" keeps rows where the Date column is less than or equal to December 31st 2017.
+
+Now we have our dataset with all the information we need AND filtered to the right timeline. The next step is to ensure we have the correct units. 
+
+
+
+
+
 
 
 
