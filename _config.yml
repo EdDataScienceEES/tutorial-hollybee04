@@ -6,24 +6,20 @@ exclude:
     - Gemfile
     - Gemfile.lock
     - vendor
-    
+
 # Installed gems
 plugins: 
     - jekyll-target-blank
     - jekyll-redirect-from
-
+ 
 # Gem settings
-
-# Css
-css: "/style.css"
-
 
 # Site settings
 encoding: utf-8
 lang: en-GB
 title: "Understanding and Building a Rainfall-Runoff Model"
 logo: "/assets/img/logos/logo_hex.svg"
-description: "A step-by-step tutorial on how to build a Rainfall-Runoff Model in R"
+description: "A tutorial on hydrological modelling"
 baseurl: ""
 url: "https://eddatascienceees.github.io/tutorial-hollybee04/"
 repo: "https://github.com/EdDataScienceEES/tutorial-hollybee04.git"
@@ -37,7 +33,7 @@ kramdown:
   input: GFM
   auto_ids: true 
 
-# Favicons
+# Favicons 
 favicons: 
     16: '/assets/img/logos/logo_hex@16px.png'
     32: '/assets/img/logos/logo_hex@32px.png'
@@ -68,7 +64,3 @@ collections:
     posts:
         output: true
         permalink: /posts/:path/
-
-# Theme setting
-theme: jekyll-theme-minimal
-
