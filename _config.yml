@@ -20,8 +20,8 @@ lang: en-GB
 title: "Understanding and Building a Rainfall-Runoff Model"
 logo: "/assets/img/logos/logo_hex.svg"
 description: ""
-baseurl: ""
-url: "https://eddatascienceees.github.io/tutorial-hollybee04/"
+baseurl: ""/tutorial-hollybee04""
+url: "https://eddatascienceees.github.io"
 repo: "https://github.com/EdDataScienceEES/tutorial-hollybee04.git"
 email: "s2345560@ed.ac.uk"
 css_inline: false 
