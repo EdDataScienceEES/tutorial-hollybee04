@@ -1,4 +1,9 @@
- 
+---
+layout: tutorial
+title: Understanding and Building a Rainfall-Runoff Model
+author: Holly Bacon
+subtitle: Deciding parameters, visualising, calibrating and validating.
+--- 
 <div style="text-align: center;">
   <img src="Figures/Tut_title.png" width="1000" height="400">
 </div> 
@@ -18,10 +23,6 @@
 #### <a href="#section2"> Part 2. Data preparationa</a>
 
 #### <a href="#section3"> 2.1 Install packages and load data</a>
-
-#### <a href="#section4"> 2.2 
-
-#### <a href="#section4"> 3. The third section</a>
 
 
 
@@ -56,7 +57,7 @@ Once validated, the model becomes a powerful resource. It can be used to predict
 > **_TIP:_**
 If you don't have much experience with R, you should check out some of the Coding Club tutorials such as, "Intro to R" (https://ourcodingclub.github.io/tutorials/intro-to-r/) to get a grip of the basics. This tutorial will also incorparate various functions from the `dplyr` package, therefore the "Basic data manipulation" tutorial (https://ourcodingclub.github.io/tutorials/data-manip-intro/) will also be very useful if you've never used the `dplyr` package before.
 
-<a name="1"></a>
+<a name="2"></a>
 ### Part 2. Data preparation  
 
 > **_TIP:_**
@@ -66,6 +67,8 @@ Open a new script, write a title, your name, the date and load in the packages a
 
 The UK Centre for Ecology and Hydrology (https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
 
+<a name="3"></a>
+### 2.1 Install packages and load data
 ```r
 # Tutorial: Understanding and Building a Rainfall-Runoff Model
 # Written by ...
