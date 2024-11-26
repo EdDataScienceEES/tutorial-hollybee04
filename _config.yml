@@ -6,12 +6,12 @@ exclude:
     - Gemfile
     - Gemfile.lock
     - vendor
-
+    
 # Installed gems
 plugins: 
     - jekyll-target-blank
     - jekyll-redirect-from
-
+ 
 # Gem settings
 
 # Site settings
@@ -19,12 +19,14 @@ encoding: utf-8
 lang: en-GB
 title: "Understanding and Building a Rainfall-Runoff Model"
 logo: "/assets/img/logos/logo_hex.svg"
-description: ""
-baseurl: ""/tutorial-hollybee04""
-url: "https://eddatascienceees.github.io"
+description: "A tutorial on hydrological modelling"
+baseurl: ""
+url: "https://eddatascienceees.github.io/tutorial-hollybee04/"
 repo: "https://github.com/EdDataScienceEES/tutorial-hollybee04.git"
 email: "s2345560@ed.ac.uk"
+google_analytics: UA-92956541-1
 css_inline: false 
+description: "A step-by-step tutorial on how to build a Rainfall-Runoff Model in R"
 markdown: kramdown
 highlighter: rouge
 kramdown:
@@ -48,16 +50,6 @@ navigation_header:
   url: /
 - title: Tutorials
   url: /tutorials.html
-- title: Course
-  url: /course.html
-- title: Team
-  url: /team.html
-- title: Get involved
-  url: /involve.html
-- title: Links
-  url: /links.html
-- title: Contact
-  url: /contact.html
 
 # Define collections
 collections:
@@ -73,3 +65,4 @@ collections:
     posts:
         output: true
         permalink: /posts/:path/
+theme: jekyll-theme-slate
