@@ -67,9 +67,13 @@ Evapotranspiration_clean$MM <- month.abb[Evapotranspiration_clean$MM] # Change t
 Merged_data <- Flow_clean %>%
   left_join(Precipitation_clean, by = "Date")
 
+Final_merged_data <- Merged_data %>%
+  left_join(Evapotranspiration_clean, by = "Date") # Doesnt work!
+
 # Change Evapotranspiration_clean to a character to match with other data sets
 Evapotranspiration_clean$Date <- as.character(Evapotranspiration_clean$Date)
 
+# Try again!
 Final_merged_data <- Merged_data %>%
   left_join(Evapotranspiration_clean, by = "Date")
 
