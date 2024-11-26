@@ -1,23 +1,21 @@
 ---
 layout: tutorial
 title: Understanding and Building a Rainfall-Runoff Model
-subtitle: A step-by-step guide
-date: 2024-20-11 10:00:00
+subtitle: Parameters, building and visualising
+date: 2024-26-11 10:00:00
 author: Holly Bacon
 tags: modelling    
 ---
-
-<div class="block"> 
+<div class="block">
 	<center>
 		<img src="{{ site.baseurl }}/Figures/Tut_title.png" alt="Img">
 	</center>
 </div>
-
 <div style="text-align: center;">
   <img src="Figures/Tut_title.png" width="1000" height="400">
 </div> 
 
-*Created by Holly Bacon* 
+*Created by Holly Bacon* c
  
 ## Tutorial Aims:
 
