@@ -1,4 +1,3 @@
-@@ -1,66 +1,4 @@
 # Exclude files from Jekyll build
 exclude:
     - README.md
@@ -7,17 +6,18 @@ exclude:
     - Gemfile
     - Gemfile.lock
     - vendor
+
 # Installed gems
 plugins: 
     - jekyll-target-blank
     - jekyll-redirect-from
  
 # Gem settings
+
 # Site settings
 encoding: utf-8
 lang: en-GB
 title: "Understanding and Building a Rainfall-Runoff Model"
-logo: "/assets/img/logos/logo_hex.svg"
 description: "A tutorial on hydrological modelling"
 baseurl: ""
 url: "https://eddatascienceees.github.io/tutorial-hollybee04/"
@@ -32,21 +32,14 @@ kramdown:
   syntax_highlighter: rouge
   input: GFM
   auto_ids: true 
-# Favicons 
-favicons: 
-    16: '/assets/img/logos/logo_hex@16px.png'
-    32: '/assets/img/logos/logo_hex@32px.png'
-    64: '/assets/img/logos/logo_hex@64px.png'
-    128: '/assets/img/logos/logo_hex@128px.png'
-    256: '/assets/img/logos/logo_hex@256px.png'
-    512: '/assets/img/logos/logo_hex@512px.png'
-    1024: '/assets/img/logos/logo_hex@1024px.png'
+
 # Site navigation
 navigation_header:
 - title: Home
   url: /
 - title: Tutorials
   url: /tutorials.html
+
 # Define collections
 collections:
     tutorials:
