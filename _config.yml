@@ -5,7 +5,6 @@ url: "https://eddatascienceees.github.io/tutorial-hollybee04/"  # Your actual si
 baseurl: ""  # Leave as empty unless you are using a subfolder
 markdown: kramdown
 theme: jekyll-theme-slate  # You can change this to another theme if desired
-theme: jekyll-theme-minimal  # Optional: Another theme you can try
 
 # Github Pages settings (optional)
 github_username: "hollybee04"  # Replace with your GitHub username
