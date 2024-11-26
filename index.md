@@ -7,6 +7,8 @@ author: Holly Bacon
 tags: modelling     
 ---
 
+<center><img src="{{ site.baseurl }}/Tut_title.png" alt="Img"></center>
+
 <div class="block">
 	<center>
 		<img src="{{ site.baseurl }}/Figures/Tut_title.png" alt="Img">
