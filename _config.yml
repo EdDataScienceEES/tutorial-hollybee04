@@ -1,5 +1,21 @@
+# Site settings
 title: "Understanding and Building a Rainfall-Runoff Model"
 description: "A Step-by-Step Guide"
+url: "https://eddatascienceees.github.io/tutorial-hollybee04/"  # Your actual site URL
+baseurl: ""  # Leave as empty unless you are using a subfolder
 markdown: kramdown
-theme: jekyll-theme-slate
+theme: jekyll-theme-slate  # You can change this to another theme if desired
 
+# Exclude files
+exclude:
+  - README.md
+  - LICENSE
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+
+# Plugins
+plugins:
+  - jekyll-target-blank
+  - jekyll-redirect-from
+  - jekyll-seo-tag
