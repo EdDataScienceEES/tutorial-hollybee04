@@ -15,7 +15,7 @@ tags: modelling
   <img src="Figures/Tut_title.png" width="1000" height="400">
 </div> 
 
-*Created by Holly Bacon* 
+*Created by Holly Bacon* c
  
 ## Tutorial Aims:
 
