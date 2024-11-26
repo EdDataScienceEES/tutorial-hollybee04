@@ -22,7 +22,7 @@ logo: "/assets/img/logos/logo_hex.svg"
 description: "A tutorial on hydrological modelling"
 baseurl: ""
 url: "https://eddatascienceees.github.io/tutorial-hollybee04/"
-repo: "https://github.com/ourcodingclub/ourcodingclub.github.io"
+repo: "https://github.com/EdDataScienceEES/tutorial-hollybee04.git"
 email: "s2345560@ed.ac.uk"
 google_analytics: UA-92956541-1
 css_inline: false 
@@ -49,16 +49,6 @@ navigation_header:
   url: /
 - title: Tutorials
   url: /tutorials.html
-- title: Course
-  url: /course.html
-- title: Team
-  url: /team.html
-- title: Get involved
-  url: /involve.html
-- title: Links
-  url: /links.html
-- title: Contact
-  url: /contact.html
 
 # Define collections
 collections:
