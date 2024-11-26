@@ -14,6 +14,10 @@ plugins:
 
 # Gem settings
 
+# Css
+css: "/style.css"
+
+
 # Site settings
 encoding: utf-8
 lang: en-GB
