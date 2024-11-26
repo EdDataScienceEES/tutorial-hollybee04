@@ -1,9 +1,3 @@
--
-layout: 
-title: Understanding and Building a Rainfall-Runoff Model
-author: Holly Bacon
-subtitle: Deciding parameters, visualising, calibrating and validating.
----
  
 <div style="text-align: center;">
   <img src="Figures/Tut_title.png" width="1000" height="400">
