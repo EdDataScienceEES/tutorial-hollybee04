@@ -9,7 +9,7 @@ tags: github datavis
 ---
 <div class="block">
 	<center>
-		<img src="{{ site.baseurl }}/img/tutheader_tutname.png" alt="Img">
+		<img src="{{ site.baseurl }}/Figures/Tut_title.png" alt="Img">
 	</center>
 </div>
 <div style="text-align: center;">
