@@ -6,11 +6,7 @@ date: 2024-26-11 10:00:00
 author: Holly Bacon
 tags: modelling    
 ---
-
-</div>
-<div style="text-align: center;">
-  <img src="Figures/Tut_title.png" width="1000" height="400">
-</div> 
+<center><img src="{{ site.baseurl }}/Tut_title.png" alt="Img"></center>
 
 *Created by Holly Bacon* 
  
@@ -247,11 +243,8 @@ Filtered_data <- Filtered_data %>%
   ungroup()
 ```
 
-{% capture callout %}
+> **_TIP:_**
 ALWAYS remember to `ungroup()` after you're done with that operation to make sure operations later on are not affected by certain columns being grouped together.
-{% endcapture %}
-{% include callout.html colour='callout' content=callout %}
-
 
 # 4 ---- OBSERVED VALUES ----
 
