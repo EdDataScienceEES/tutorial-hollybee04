@@ -17,14 +17,13 @@ plugins:
 # Site settings
 encoding: utf-8
 lang: en-GB
-title: "Coding Club"
+title: "Understanding and Building a Rainfall-Runoff Model"
 logo: "/assets/img/logos/logo_hex.svg"
 description: ""
 baseurl: ""
-url: "https://ourcodingclub.github.io"
-repo: "https://github.com/ourcodingclub/ourcodingclub.github.io"
-email: "ourcodingclub@gmail.com"
-google_analytics: UA-92956541-1
+url: "https://eddatascienceees.github.io/tutorial-hollybee04/"
+repo: "https://github.com/EdDataScienceEES/tutorial-hollybee04.git"
+email: "s2345560@ed.ac.uk"
 css_inline: false 
 markdown: kramdown
 highlighter: rouge
