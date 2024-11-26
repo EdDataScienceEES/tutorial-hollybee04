@@ -11,7 +11,7 @@ exclude:
 plugins: 
     - jekyll-target-blank
     - jekyll-redirect-from
-
+ 
 # Gem settings
 
 # Site settings
