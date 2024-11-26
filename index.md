@@ -1,11 +1,10 @@
 ---
-title: "Title to appear on website"
-author: "First name of Author"
-date: "2017-04-25 08:00:00"
-meta: Tutorials
-subtitle: "Subtitle to appear on website"
-layout: post
-tags: github datavis
+layout: tutorial
+title: Understanding and Building a Rainfall-Runoff Model
+subtitle: Parameters, building and visualising
+date: 2024-26-11 10:00:00
+author: Holly Bacon
+tags: modelling
 ---
 <div class="block">
 	<center>
