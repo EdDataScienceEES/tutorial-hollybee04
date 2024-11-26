@@ -6,16 +6,13 @@ date: 2024-26-11 10:00:00
 author: Holly Bacon
 tags: modelling    
 ---
-<div class="block">
-	<center>
-		<img src="{{ site.baseurl }}/Figures/Tut_title.png" alt="Img">
-	</center>
+
 </div>
 <div style="text-align: center;">
   <img src="Figures/Tut_title.png" width="1000" height="400">
 </div> 
 
-*Created by Holly Bacon* c
+*Created by Holly Bacon* 
  
 ## Tutorial Aims:
 
@@ -250,9 +247,10 @@ Filtered_data <- Filtered_data %>%
   ungroup()
 ```
 
-> **_TIP:_**
+{% capture callout %}
 ALWAYS remember to `ungroup()` after you're done with that operation to make sure operations later on are not affected by certain columns being grouped together.
-
+{% endcapture %}
+{% include callout.html colour='callout' content=callout %}
 
 
 # 4 ---- OBSERVED VALUES ----
