@@ -11,7 +11,7 @@ exclude:
 plugins: 
     - jekyll-target-blank
     - jekyll-redirect-from
- 
+
 # Gem settings
 
 # Site settings
@@ -19,14 +19,13 @@ encoding: utf-8
 lang: en-GB
 title: "Understanding and Building a Rainfall-Runoff Model"
 logo: "/assets/img/logos/logo_hex.svg"
-description: "A tutorial on hydrological modelling"
+description: "A step-by-step tutorial on how to build a Rainfall-Runoff Model in R"
 baseurl: ""
 url: "https://eddatascienceees.github.io/tutorial-hollybee04/"
 repo: "https://github.com/EdDataScienceEES/tutorial-hollybee04.git"
 email: "s2345560@ed.ac.uk"
 google_analytics: UA-92956541-1
 css_inline: false 
-description: "A step-by-step tutorial on how to build a Rainfall-Runoff Model in R"
 markdown: kramdown
 highlighter: rouge
 kramdown:
@@ -34,7 +33,7 @@ kramdown:
   input: GFM
   auto_ids: true 
 
-# Favicons 
+# Favicons
 favicons: 
     16: '/assets/img/logos/logo_hex@16px.png'
     32: '/assets/img/logos/logo_hex@32px.png'
@@ -65,4 +64,7 @@ collections:
     posts:
         output: true
         permalink: /posts/:path/
-theme: jekyll-theme-slate
+
+# Theme setting
+theme: jekyll-theme-minimal
+
