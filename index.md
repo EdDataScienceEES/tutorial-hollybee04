@@ -1,9 +1,17 @@
 ---
-layout: tutorial
-title: Understanding and Building a Rainfall-Runoff Model
-author: Holly Bacon
-subtitle: Deciding parameters, visualising, calibrating and validating.
---- 
+title: "Title to appear on website"
+author: "First name of Author"
+date: "2017-04-25 08:00:00"
+meta: Tutorials
+subtitle: "Subtitle to appear on website"
+layout: post
+tags: github datavis
+---
+<div class="block">
+	<center>
+		<img src="{{ site.baseurl }}/img/tutheader_tutname.png" alt="Img">
+	</center>
+</div>
 <div style="text-align: center;">
   <img src="Figures/Tut_title.png" width="1000" height="400">
 </div> 
