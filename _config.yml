@@ -3,13 +3,12 @@
 title: "Understanding and Building a Rainfall-Runoff Model"
 description: "A step-by-step tutorial on how to build your own Rainfall-Runoff Model"
 url: "https://eddatascienceees.github.io/tutorial-hollybee04/"#Your actual site URL
-baseurl: ""#Leave as empty unless you are using a subfolder
+baseurl: "/tutorial-hollybee04" #Leave as empty unless you are using a subfolder
 markdown: kramdown
-theme: jekyll-theme-slate #You can change this to another theme if desired
 theme: jekyll-theme-minimal #Optional: Another theme you can try
 
 #Github Pages settings (optional)
-github_username: "hollybee04"#Replace with your GitHub username
+github_username: "hollybee04" #Replace with your GitHub username
 
 #Exclude files
 exclude:

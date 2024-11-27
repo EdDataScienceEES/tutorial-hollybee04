@@ -11,7 +11,8 @@ tags: modelling
 	<center>
 		<img src="{{ site.baseurl }}/Figures/Tut_title.png" alt="Img">
 	</center>
-</div>
+
+ </div>
 <div style="text-align: center;">
   <img src="Figures/Tut_title.png" width="1000" height="400">
 </div> 
@@ -26,14 +27,21 @@ tags: modelling
 
 ## Tutorial Steps:
 
-#### <a href="#1"> 1. What is a Rainfall-Runoff Model?</a>
+## <a href="#1"> 1. What is a Rainfall-Runoff Model?</a>
 
-#### <a href="#a"> a) Why do we want to do this?</a>
+#### <a href="#1.2"> 1a. Why do we want to do this?</a>
 
-#### <a href="#section2"> Part 2. Data preparationa</a>
+## <a href="#2"> 2. Data preparation</a>
 
-#### <a href="#section2"> 2.1. Install packages and load data</a>
+#### <a href="#2"> 2a. Install packages and load data</a>
 
+#### <a href="#2"> 2b. Remove metadata, name and select columns</a>
+
+#### <a href="#2"> 2c. Using `left_join()` to merge datasets</a>
+
+#### <a href="#2"> 2d. Filter dataset to 2015-2017</a>
+
+#### <a href="#2"> 2e. Fix up the units</a>
 
 
 <a name="1"></a>
@@ -54,8 +62,8 @@ Here, we can see precipitation enters the system and either:
 
 So.. what if we created a model that could predict the average flow of water through a river each month in any year. 
 
-<a name="a"></a>
-### a) Why do we want to do this?
+<a name="1.2"></a>
+### 1a. Why do we want to do this?
 
 Runoff models aim to successfully track changes in water availability, floods and droughts over time (Jehanzaib et al, 2022). 
 
@@ -69,7 +77,7 @@ Once validated, the model becomes a powerful resource. It can be used to predict
 If you don't have much experience with R, you should check out some of the Coding Club tutorials such as, "Intro to R" (https://ourcodingclub.github.io/tutorials/intro-to-r/) to get a grip of the basics. This tutorial will also incorparate various functions from the `dplyr` package, therefore the "Basic data manipulation" tutorial (https://ourcodingclub.github.io/tutorials/data-manip-intro/) will also be very useful if you've never used the `dplyr` package before.
 
 <a name="2"></a>
-### Part 2. Data preparation  
+### 2. Data preparation  
 
 > **_TIP:_**
 All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>. Click code, download the URL and paste in a new project in R Studio. 
@@ -77,8 +85,8 @@ Open a new script, write a title, your name, the date and load in the packages a
 
 The UK Centre for Ecology and Hydrology (https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
 
-<a name="3"></a>
-### 2.1 Install packages and load data
+<a name="2.1"></a>
+### 2a. Install packages and load data
 ```r
 # Tutorial: Understanding and Building a Rainfall-Runoff Model
 # Written by ...
@@ -115,7 +123,8 @@ Evapotranspiration <- get_power(
 
 If you were to pick a different catchment, you would download data specific to that area, including latitude and longitude values. I found these on google maps by matching up roughly where the rain guage was on CEH.
 
-### 2.1 Install packages and load data
+<a name="2.2"></a>
+### 2b. Remove metadata, name and select columns
 
 ```r
 ---- Data preparation ----
@@ -152,6 +161,9 @@ Evapotranspiration_clean$MM <- month.abb[Evapotranspiration_clean$MM] # Change t
 ```
 
 If you're confused what the pipes (`%>%`) are doing, head to the 'Efficient data manipulation' tutorial (https://ourcodingclub.github.io/tutorials/data-manip-efficient/) which introduces pipes. If you just need a quick reminder - pipes chain operations together in a more efficient and readable way! 
+
+<a name="2.3"></a>
+### 2c. Using `left_join()` to merge datasets
 
 Great! Now we have all the data we need and it's pretty organised now. But it's all seperate. Lets combine the 3 datasets together using a cool `dplyr` function called `left_join` 
 
@@ -191,9 +203,12 @@ Final_merged_data <- Merged_data %>%
 
 ```
 
-You can also use this when you need to change a column to a factor or numeric: as.factor, as.numeric. 
+You can also use this when you need to change a column to a factor or numeric: `as.factor`, `as.numeric`. 
 
 OKAY! Now we have one big data set containing all the information we need. What's next?
+
+<a name="2.4"></a>
+### 2d. Filter dataset to 2015-2017
 
 Now we need to filter to the years we want to calibrate our model with (2015-2017). We can do this by using the `filter()` function which selects rows based on the conditions we set. 
 
@@ -208,6 +223,9 @@ Filtered_data <- Final_merged_data %>%
 
 - Condition 1: "Date >= as.Date("2015-01-01")" keeps rows where the Date column is greater than or equal to January 1st 2015. "as.Date" ensures date is treated as a date and not just text.
 - Condition 2: "Date <= as.Date("2017-12-31")" keeps rows where the Date column is less than or equal to December 31st 2017.
+
+<a name="2.5"></a>
+### 2e. Fix up the units
 
 Now we have our dataset with all the information we need AND filtered to the right timeline. The next step is to ensure we have the correct units. In hydrological modelling we often use m to maintain consistency with other variables (such as flow). We can leave Et as it is as we are only going to be visualising Et trends to help us decide one of the parameters. 
 
@@ -253,14 +271,60 @@ Filtered_data <- Filtered_data %>%
 > **_TIP:_**
 ALWAYS remember to `ungroup()` after you're done with that operation to make sure operations later on are not affected by certain columns being grouped together.
 
-# 4 ---- OBSERVED VALUES ----
+PERFECT! Well done. Now, we have successfully prepared our data and we're almost ready to start building our model. Before we jump into creating the model, why not we plot out the observed ("real") flow values that were measured during 2015, 2016 and 2017 to get an idea of the general trends, similarities and differences between the three years. 
 
-# Lets calculate these, to get a jist of what were aiming for. 
+<a name="3"></a>
+### 3. Visualising the observed flow values
 
-Data <- Data %>%
-  group_by(Year, MM) %>%  # Group by both Year and Month
-  mutate(Observed_flow = Monthly_flow_m3 / (31*24*60*60)) %>%
-  ungroup()
+The aim of a Rainfall-Runoff model is to match up the predicted channel discharge values that the model produces with the observed values, measured in real life. This can be difficult because it will be tempting to adjust parameters as much as possible to align with real life, but we must avoid this because the parameters must attempt to reflect the hydrological processes within the catchment and the value we decide for them has to be justified by a hydrological process or characteristic observed in the catchment. Over calibrating and tweaking parameters for no reason, reduces accuracy in the model predicting extreme events if it doesn't align with the correct processes and characteristics. 
+
+Okay, enough of that! Let's check out these observed flows. 
+
+We're going to be using the `lubricate` package to note down the number of days in each month into a column called `Days_in_month`. This saves us having to go through each month and state the number of days. That would take ages! 
+
+```r
+
+# Calculate observed flow (m3/s)
+Observed_values <- Filtered_data %>%
+  mutate(
+    Days_in_month = days_in_month(ymd(paste(Year, MM, "01"))), # Get the number of days in the month
+    Observed_flow_m3pers = Monthly_flow_m3 / (Days_in_month * 24 * 60 * 60) # Convert to m³/s
+  ) %>%
+  group_by(Year, MM) %>%
+  summarize(
+    Observed_flow_m3/s = first(Observed_flow_m3pers), # It's going to be the same value for every day of the month so let's only keep only one value per group
+    .groups = "drop" # Ungroup after summarizing
+  )
+
+# Plot time!
+
+# Use ggplot to visualise flow over time
+ggplot(Observed_values, aes(x = MM, y = Observed_flow_m3pers, group = Year, color = factor(Year))) + # group ensures data from the same year are on the same line. colour ensures a different colour for each line. factor ensures year is treated as a categorical variable and not numeric. 
+  geom_line() +
+  labs(
+    x = "Month",
+    y = "Observed flow (m³/s)",
+    color = "Year"
+  ) +
+  theme_minimal()
+```
+
+<center> <img src="{{ site.baseurl }}/Figures/Flow.month.png" alt="Img" style="width: 800px;"/> </center>
+
+
+# consider a facet
+
+ggplot(Observed_values, aes(x = MM, y = Observed_flow)) +
+  geom_line(aes(group = Year, color = factor(Year))) + # Line for each year
+  geom_point(aes(color = factor(Year))) +             # Points for clarity
+  facet_wrap(~ Year) +                                # Create a facet for each year
+  labs(
+    x = "Month",
+    y = "Observed Flow",
+    color = "Year"
+  ) +
+  theme_minimal()
+
 
 # 5 ---- PARAMETERS ----
 
