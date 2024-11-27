@@ -12,6 +12,11 @@ tags: modelling
 		<img src="{{ site.baseurl }}/Figures/Tut_title.png" alt="Img">
 	</center>
 
+ </div>
+<div style="text-align: center;">
+  <img src="Figures/Tut_title.png" width="1000" height="400">
+</div> 
+
 *Created by Holly Bacon* 
 
 ## Tutorial Aims:
