@@ -309,7 +309,7 @@ ggplot(Observed_values, aes(x = MM, y = Observed_flow_m3pers, group = Year, colo
   theme_minimal()
 ```
 
-<center> <img src="{{ site.baseurl }}/Figures/Flow.month.png" alt="Img" style="width: 800px;"/> </center>
+![Observed flow against time]({{ site.baseurl }}/Figures/Flow.month.png)
 
 
 # consider a facet
