@@ -98,6 +98,7 @@ library(nasapower) # for downloading evapotranspiration data
 library(dplyr) # for data manipulation
 library(ggplot2) # for data visualisation
 library(lubridate) # for data handling
+library(viridis) # colour blind friendly palette
 
 ---- Load data ----
 
@@ -266,6 +267,19 @@ Filtered_data <- Filtered_data %>%
   group_by(Year, MM) %>% # Now we're focusing on months to get the monthly flow. 
   mutate(Monthly_flow_m3 = sum(Daily_flow_m3)) %>%
   ungroup()
+
+# One last thing!
+
+# Month and year must be set to a factor with the correct order so they dont appear on figures as "April".."June".."Dec"... the wrong order!
+
+Filtered_data <- Filtered_data %>%
+  mutate(
+    MM = factor(
+      MM,
+      levels = month.abb  # Levels set to the correct order (Jan, Feb, ..., Dec)
+    ),
+    Year = as.factor(Year)
+  )
 ```
 
 > **_TIP:_**
@@ -309,7 +323,7 @@ ggplot(Observed_values, aes(x = MM, y = Observed_flow_m3pers, group = Year, colo
   theme_minimal()
 ```
 
-<img src="{{ site.baseurl }}/Figures/Flow.month.png" alt="Observed flow against time" width="400"/>
+<img src="{{ site.baseurl }}/Figures/Flow.month.png" alt="Observed flow against time" width="600"/>
 
 
 
