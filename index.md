@@ -325,21 +325,32 @@ ggplot(Observed_values, aes(x = MM, y = Observed_flow_m3pers, group = Year, colo
 
 <img src="{{ site.baseurl }}/Figures/Flow.month.png" alt="Observed flow against time" width="600"/>
 
+Okay. Here, we begin to realise the challenges with hydrological modelling. Our goal is to calibrate a model that works as best as possible for all three years. It might work perfectly for one year, but then if it doesn't for the other two years, then it's not exactly representative of the catchment. Ideally, you could use more years, perhaps over 10 or 20 years to gain a better perspective of changes and typical trends. 
 
+Another way to visualise this data is by using `facet_wrap` which splits it up into three boxes (by year). Try it out!
 
-# consider a facet
+```r
+# Plotting with facet_wrap
 
 ggplot(Observed_values, aes(x = MM, y = Observed_flow)) +
-  geom_line(aes(group = Year, color = factor(Year))) + # Line for each year
-  geom_point(aes(color = factor(Year))) +             # Points for clarity
-  facet_wrap(~ Year) +                                # Create a facet for each year
+  geom_line(aes(group = Year, color = factor(Year))) + 
+  geom_point(aes(color = factor(Year))) +             
+  facet_wrap(~ Year) +   # Create a facet for each year.                          
   labs(
     x = "Month",
     y = "Observed Flow",
     color = "Year"
   ) +
   theme_minimal()
+```
 
+  <img src="{{ site.baseurl }}/Figures/Flow.year.png" alt="Observed flow in 2015, 2016 and 2017" width="600"/>
+
+This enables us to view each year more easily. What can you notice about each one? Any similarities? Big differences?
+
+- I can definitely see a big peek at the end of 2015.
+- January flows of 2015 and 2016 are both pretty high.
+- Flow in 2017 is a lot lower than the previous 2 years. 
 
 # 5 ---- PARAMETERS ----
 
