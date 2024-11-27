@@ -45,7 +45,7 @@ tags: modelling
 
 
 <a name="1"></a>
-### 1. What is a Rainfall-Runoff model?
+## 1. What is a Rainfall-Runoff model?
 
 Welcome! Here, you're going to learn the basis of creating a Rainfall-Runoff model. But, you might be wondering... okay but what is a Rainfall-Runoff model? If you're not familiar with this, that's okay. Let's go over it:
 
@@ -79,7 +79,7 @@ Once validated, the model becomes a powerful resource. It can be used to predict
 If you don't have much experience with R, you should check out some of the Coding Club tutorials such as, "Intro to R" (https://ourcodingclub.github.io/tutorials/intro-to-r/) to get a grip of the basics. This tutorial will also incorparate various functions from the `dplyr` package, therefore the "Basic data manipulation" tutorial (https://ourcodingclub.github.io/tutorials/data-manip-intro/) will also be very useful if you've never used the `dplyr` package before.
 
 <a name="2"></a>
-### 2. Data preparation  
+## 2. Data preparation  
 
 > **_TIP:_**
 All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>. Click code, download the URL and paste in a new project in R Studio. 
@@ -290,7 +290,7 @@ ALWAYS remember to `ungroup()` after you're done with that operation to make sur
 PERFECT! Well done. Now, we have successfully prepared our data and we're almost ready to start building our model. Before we jump into creating the model, why not we plot out the observed ("real") flow values that were measured during 2015, 2016 and 2017 to get an idea of the general trends, similarities and differences between the three years. 
 
 <a name="3"></a>
-### 3. Visualising the observed flow values
+## 3. Visualising the observed flow values
 
 The aim of a Rainfall-Runoff model is to match up the predicted channel discharge values that the model produces with the observed values, measured in real life. This can be difficult because it will be tempting to adjust parameters as much as possible to align with real life, but we must avoid this because the parameters must attempt to reflect the hydrological processes within the catchment and the value we decide for them has to be justified by a hydrological process or characteristic observed in the catchment. Over calibrating and tweaking parameters for no reason, reduces accuracy in the model predicting extreme events if it doesn't align with the correct processes and characteristics. 
 
@@ -368,7 +368,7 @@ This enables us to view each year more easily. What can you notice about each on
 - Flow in 2017 is a lot lower than the previous 2 years. 
 
 <a name="4"></a>
-### 4. Parameters
+## 4. Parameters
 
 <a name="4a."></a>
 ### 4a. Understanding how to decide parameter values
@@ -378,7 +378,7 @@ I think the easiest way to understand the parameters we're going to be using, is
   <img src="{{ site.baseurl }}/Figures/Model.jpg" alt="Rainfall-Runoff model" width="600"/>
 *Figure 4: Rainfall-Runoff Model (Moore, 2007)*
 
-Look at P and follow the arrows downwards. The first thing we see is E (Evapotranspiration). How much precipitation is evapotranspirated? This will affect how much water is available for other pathways. This leads us to our first parameter:
+Look at P and follow the arrows downwards. The first thing we see is E (Evapotranspiration). This will affect how much water is available for other pathways. This leads us to our first parameter:
 
 <a name="4b."></a>
 ### 4b. L1
@@ -425,24 +425,29 @@ So what does this mean? Well.. based on the Et graph, we may choose to separate 
 
 - __June to July__ = VERY high Et = __0.2__ 
 
+<a name="4c."></a>
+### 4c. Surface to channel (C1)
 
+Okay now lets think about what happens to precipitation when it hits the surface. It's either going to infiltrate into the ground (__C2__) or run straight to the channel, over the surface as surface runoff (__C1__). 
 
   <img src="{{ site.baseurl }}/Figures/Model.jpg" alt="Rainfall-Runoff model" width="600"/>
 *Figure 4: Rainfall-Runoff Model (Moore, 2007)*
 
-# 5.2 Surface to Channel (C1) ----
+For this, we need to be thinking about:
+- __TOPOGRAPHY__: UPLAND = STEEP = FAST RUNOFF
+- __SOIL TYPE__: Permeable or impermeable?
 
-# Topography, soil type - permeable, impermeable? 
+Guess what! CEH contains everything we need! The catchment has low permeability, upland, but it does have floodplains which can store water in flood events, reducing runoff. In general, we would expect this parameter value to be high due to the low permeability, meaning less water will infiltrate and the upland topography promoting fast runoff. However, it does contain floodplains so we can't make the value too high. 
 
-# Low permeability 
-# UPLAND = STEEP = FAST RUNOFF
-# However, it does have floodplains which can store water in flood events, reducing runoff.
-# But generally, we would expect this number to be high. 
-# C1 + C2 CANT EQUAL 1 OR MORE THAN 1 = STORAGE IS EMPTY
+What do we think?
 
-# 0.6 = 60% of water goes straight to channel.
+__C1 = 0.6__ (meaning 60% of water goes straight to the channel).
 
-# 5.3 Surface to ground (C2) ----
+> **_TIP:_** As we're keeping this model pretty simple, we're going to assume it remains the same throughout the whole year. But, if you were to create a model of your own, you might want to consider changing this value seasonally with changes in groundwater and soil moisture storage, which may differ throughout the year and therefore have an affect on C2 (infiltration) rates, ultimately affecting C1 as well! 
+
+<a name="4d."></a>
+### 4d. Surface to ground (C2)
+
 
 # Low permeability
 
@@ -459,6 +464,7 @@ So what does this mean? Well.. based on the Et graph, we may choose to separate 
 # This is hard, you may have to research for this.
 
 # But lets just say 20% for now. 
+# C1 + C2 CANT EQUAL 1 OR MORE THAN 1 = STORAGE IS EMPTY
 
 # 6 ---- BUILDING THE MODEL ----
 
