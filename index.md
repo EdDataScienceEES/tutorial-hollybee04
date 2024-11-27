@@ -25,11 +25,13 @@ tags: modelling
 
 ## Tutorial Steps:
 
-#### <a href="#section1"> 1. What is a Rainfall-Runoff Model?</a>
+#### <a href="#1"> 1. What is a Rainfall-Runoff Model?</a>
+
+#### <a href="#a"> a) Why do we want to do this?</a>
 
 #### <a href="#section2"> Part 2. Data preparationa</a>
 
-#### <a href="#section3"> 2.1 Install packages and load data</a>
+#### <a href="#section2"> 2.1. Install packages and load data</a>
 
 
 
@@ -51,7 +53,8 @@ Here, we can see precipitation enters the system and either:
 
 So.. what if we created a model that could predict the average flow of water through a river each month in any year. 
 
-### Why do we want to do this?
+<a name="a"></a>
+### a) Why do we want to do this?
 
 Runoff models aim to successfully track changes in water availability, floods and droughts over time (Jehanzaib et al, 2022). 
 
@@ -70,79 +73,65 @@ If you don't have much experience with R, you should check out some of the Codin
 > **_TIP:_**
 All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>. Click code, download the URL and paste in a new project in R Studio. 
 
-Open a new script, write a title, your name, the date and load in the packages and data. Throughout this tutorial you can copy the code boxes into your own script. Remember # give extra context and explain what the code is doing! 
+- Land cover - Woodland? Agriculture? Urban? Woodland = Higher interception, Higher Et? Urban = impermeable roads and pavements = more surface runoff.
 
-The UK Centre for Ecology and Hydrology (https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
+These are all factors you have to think about when deciding parameters. 
+                   
+<center><img src="{{ site.baseurl }}/tutheaderbl.png" alt="Img"></center>
 
-<a name="3"></a>
-### 2.1 Install packages and load data
+To add images, replace `tutheaderbl1.png` with the file name of any image you upload to your GitHub repository.
+
+### Tutorial Aims
+
+#### <a href="#section1"> 1. The first section</a>
+
+#### <a href="#section2"> 2. The second section</a>
+
+#### <a href="#section3"> 3. The third section</a>
+
+You can read this text, then delete it and replace it with your text about your tutorial: what are the aims, what code do you need to achieve them?
+---------------------------
+We are using `<a href="#section_number">text</a>` to create anchors within our text. For example, when you click on section one, the page will automatically go to where you have put `<a name="section_number"></a>`.
+
+To create subheadings, you can use `#`, e.g. `# Subheading 1` creates a subheading with a large font size. The more hashtags you add, the smaller the text becomes. If you want to make text bold, you can surround it with `__text__`, which creates __text__. For italics, use only one understore around the text, e.g. `_text_`, _text_.
+
+# Subheading 1
+## Subheading 2
+### Subheading 3
+
+This is some introductory text for your tutorial. Explain the skills that will be learned and why they are important. Set the tutorial in context.
+
+You can get all of the resources for this tutorial from <a href="https://github.com/ourcodingclub/CC-EAB-tut-ideas" target="_blank">this GitHub repository</a>. Clone and download the repo as a zip file, then unzip it.
+
+<a name="section1"></a>
+
+## 1. The first section
+
+
+At the beginning of your tutorial you can ask people to open `RStudio`, create a new script by clicking on `File/ New File/ R Script` set the working directory and load some packages, for example `ggplot2` and `dplyr`. You can surround package names, functions, actions ("File/ New...") and small chunks of code with backticks, which defines them as inline code blocks and makes them stand out among the text, e.g. `ggplot2`.
+
+When you have a larger chunk of code, you can paste the whole code in the `Markdown` document and add three backticks on the line before the code chunks starts and on the line after the code chunks ends. After the three backticks that go before your code chunk starts, you can specify in which language the code is written, in our case `R`.
+
+To find the backticks on your keyboard, look towards the top left corner on a Windows computer, perhaps just above `Tab` and before the number one key. On a Mac, look around the left `Shift` key. You can also just copy the backticks from below.
+
 ```r
-# Tutorial: Understanding and Building a Rainfall-Runoff Model
-# Written by ...
-# Date 
+# Set the working directory
+setwd("your_filepath")
 
----- Library ----
-
-library(nasapower) # for downloading evapotranspiration data 
-library(dplyr) # for data manipulation
-library(ggplot2) # for data visualisation
-library(lubridate) # for data handling
-
----- Load data ----
-
-Flow <- read.csv("data/Daily_flow.csv")
-Precipitation <- read.csv("data/Rainfall_Data.csv")
-
-# Download Et data from NASA! (nasapower)
-
-# Set coordinates for the Tweed catchment.
-
-Latitude <- 55.647
-Longitude <- -3.179
-
-Evapotranspiration <- get_power(
-  community = "AG", # AG = agriculture
-  pars = "EVPTRNS",  # Evapotranspiration
-  lonlat = c(longitude, latitude),
-  temporal_api = "daily",
-  dates = c("2015-01-01", "2017-12-31") # Data range. We are choosing to base the model on these 3 years but you could do different years or for a longer time. 
-)
-
+# Load packages
+library(ggplot2)
+library(dplyr)
 ```
-If you were to pick a different catchment, you would download data specific to that area, including latitude and longitude values. I found these on google maps by matching up roughly where the rain guage was on CEH.
+
+<a name="section2"></a>
+
+## 2. The second section
+
+You can add more text and code, e.g.
 
 ```r
----- Data preparation ----
-
-# Remove first 19 rows of metadata
-
-Flow_clean <- Flow[20:nrow(Flow), ] # This excludes the first 19 rows and only rows 20 and on are kept in the new data frame "Flow_clean".
-
-Precipitation_clean <- Precipitation[20:nrow(Precipitation), ]
-
-# Name the new columns
-
-colnames(Flow_clean) <- c("Date", "Daily_flow_m3pers") # CEH states the daily flow data is recorded in m3/s.
-
-colnames(Precipitation_clean) <- c("Date", "Precipitation_mm")
-
-# Select necessary columns
-
-Flow_clean <- Flow_clean %>%
-  select(Date, Daily_flow_m3pers )
-
-Precipitation_clean <- Precipitation_clean %>%
-  select(Date, Precipitation_mm )
-
-Evapotranspiration_clean <- Evapotranspiration %>%
-  select(YEAR, MM, DD, DOY, YYYYMMDD, EVPTRNS)
-
-# Name Et columns 
-
-colnames(Evapotranspiration_clean) <- c("Year", "MM", "DD", "DOY", "Date", "Et_mm")
-
-Evapotranspiration_clean$MM <- month.abb[Evapotranspiration_clean$MM] # Change to names instead of numeric month values. "month.abb" = 3 letter abreviations for the months.
-
+# Create fake data
+x_dat <- rnorm(n = 100, mean = 5, sd = 2)  # x data
 y_dat <- rnorm(n = 100, mean = 10, sd = 0.2)  # y data
 xy <- data.frame(x_dat, y_dat)  # combine into data frame
 ```
@@ -217,3 +206,4 @@ Everything below this is footer material - text and links that appears at the en
 		</div>
 	</div>
 </div>
+![image](https://github.com/user-attachments/assets/b9fedd91-ca2c-4fdd-a3f9-bfce70fc7a11)
