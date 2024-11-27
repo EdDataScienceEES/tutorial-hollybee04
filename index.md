@@ -27,11 +27,11 @@ tags: modelling
 
 ## Tutorial Steps:
 
-#### <a href="#1"> 1. What is a Rainfall-Runoff Model?</a>
+## <a href="#1"> 1. What is a Rainfall-Runoff Model?</a>
 
 #### <a href="#1.2"> 1a. Why do we want to do this?</a>
 
-#### <a href="#2"> 2. Data preparation</a>
+## <a href="#2"> 2. Data preparation</a>
 
 #### <a href="#2"> 2a. Install packages and load data</a>
 
@@ -288,24 +288,29 @@ We're going to be using the `lubricate` package to note down the number of days 
 Observed_values <- Filtered_data %>%
   mutate(
     Days_in_month = days_in_month(ymd(paste(Year, MM, "01"))), # Get the number of days in the month
-    Observed_flow_m3/s = Monthly_flow_m3 / (Days_in_month * 24 * 60 * 60) # Convert to m³/s
+    Observed_flow_m3pers = Monthly_flow_m3 / (Days_in_month * 24 * 60 * 60) # Convert to m³/s
   ) %>%
   group_by(Year, MM) %>%
   summarize(
-    Observed_flow_m3/s = first(Observed_flow_m3/s), # It's going to be the same value for every day of the month so let's only keep only one value per group
+    Observed_flow_m3/s = first(Observed_flow_m3pers), # It's going to be the same value for every day of the month so let's only keep only one value per group
     .groups = "drop" # Ungroup after summarizing
   )
 
 # Plot time!
 
-ggplot(Observed_values, aes(x = MM, y = Observed_flow, group = Year, color = factor(Year))) +
+# Use ggplot to visualise flow over time
+ggplot(Observed_values, aes(x = MM, y = Observed_flow_m3pers, group = Year, color = factor(Year))) + # group ensures data from the same year are on the same line. colour ensures a different colour for each line. factor ensures year is treated as a categorical variable and not numeric. 
   geom_line() +
   labs(
     x = "Month",
-    y = "Observed flow (m3/s)",
+    y = "Observed flow (m³/s)",
     color = "Year"
   ) +
   theme_minimal()
+```
+
+<center> <img src="{{ site.baseurl }}/Figures/Flow.month.png" alt="Img" style="width: 800px;"/> </center>
+
 
 # consider a facet
 
