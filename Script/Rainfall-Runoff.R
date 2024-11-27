@@ -9,7 +9,7 @@ library(ggplot2)
 library(tidyr)
 library(tidyverse)
 library(lubridate)
-
+library(viridis) # Colour blind friendly palette
 
 # 2. ---- Load data ----
 
@@ -134,18 +134,61 @@ Filtered_data <- Filtered_data %>%
     Year = as.factor(Year)
   )
 
-Data <- Filtered_data
+
 
 # 4 ---- OBSERVED VALUES ----
 
 # Lets calculate these, to get a jist of what were aiming for. 
 
-Data <- Data %>%
-  group_by(Year, MM) %>%  # Group by both Year and Month
-  mutate(Observed_flow = Monthly_flow_m3 / (31*24*60*60)) %>%
-  ungroup()
+library(lubridate) # For working with dates
 
-# 5 ---- PARAMETERS ----
+Observed_values <- Filtered_data %>%
+  mutate(
+    Days_in_month = days_in_month(ymd(paste(Year, MM, "01"))), # Get the number of days in the month
+    Observed_flow_m3pers = Monthly_flow_m3 / (Days_in_month * 24 * 60 * 60) # Convert to m³/s
+  ) %>%
+  group_by(Date, Year, MM) %>%
+  summarize(
+    Observed_flow_m3pers = first(Observed_flow_m3pers), # Keep only one value per group
+    .groups = "drop" # Ungroup after summarizing
+  )
+
+
+# Plot
+
+ggplot(Observed_values, aes(x = MM, y = Observed_flow_m3pers, group = Year, color = factor(Year))) +
+  geom_line() +
+  labs(
+    x = "Month",
+    y = "Observed flow (m3/s)",
+    color = "Year"
+  ) +
+  scale_color_viridis(discrete = TRUE) +  # Colorblind-friendly viridis palette
+  theme_bw() +
+  theme(
+    panel.grid = element_blank(), 
+    plot.margin = unit(c(1, 0, 1, 0), "cm")  # Adjust margins if needed
+  )
+
+# consider a facet
+
+ggplot(Observed_values, aes(x = MM, y = Observed_flow_m3pers)) +
+  geom_line(aes(group = Year, color = factor(Year))) + # Line for each year
+  geom_point(aes(color = factor(Year))) +             # Points for clarity
+  facet_wrap(~ Year) +                                # Create a facet for each year
+  labs(
+    x = "Month",
+    y = "Observed Flow",
+    color = "Year"
+  ) +
+  scale_color_viridis(discrete = TRUE) +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank(),                                
+    plot.margin = unit(c(1,0,1,0), units = , "cm"))
+
+
+# geom_linerange()# 5 ---- PARAMETERS ----
 
 
 # 5.1 Loss term 1 (L1) ----
@@ -157,13 +200,16 @@ Data <- Data %>%
 # But hang on, its gonna differ seasonally. 
 # Lets look at Et levels throughout the years 
 
-ggplot(Data, aes(x = MM, y = Et_mm, color = Year, group = Year)) + 
+ggplot(Filtered_data, aes(x = MM, y = Et_mm, color = Year, group = Year)) + 
   geom_point() +
-  labs(title = "Et Levels 2015-2017", 
+  labs(
        x = "Month", 
        y = "Evapotranspiration (mm)") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  scale_color_viridis(discrete = TRUE) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid = element_blank())
 
 # Nov-March low-none Et
 # March, Apr and Oct mid Et
@@ -222,18 +268,18 @@ ggplot(Data, aes(x = MM, y = Et_mm, color = Year, group = Year)) +
 # 6 ---- BUILDING THE MODEL ----
 
 # Aggregate daily data into monthly data so we only have 1 row each month
-Monthly_data <- Data %>%
+Monthly_data <- Filtered_data %>%
   group_by(Year, MM) %>% # Group by Year and Month
   summarize(
     # Retain the first value for columns that don't vary within the month
     Monthly_precipitation_m = first(Monthly_precipitation_m),
-    Observed_flow = first(Observed_flow),
     .groups = "drop" # Ungroup after summarizing
   )
 
 # Create columns of each stage in the model
 Rainfall_Runoff_Model <- Monthly_data %>%
   mutate(
+    ID = row_number(),
     Area = 694,
     Initial_surface_storage = 0,
     Initial_ground_storage = 0,
@@ -294,7 +340,10 @@ for (i in 1:nrow(Rainfall_Runoff_Model)) {
   }
 }
 
+
 # 8 ---- Time to compare ----
+
+
 
 # Assuming 'Rainfall_Runoff_Model' has columns: Date, Rainfall, Runoff
 
@@ -302,18 +351,30 @@ Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
   # Create a 'Date' column with first day of each month
   mutate(Date = seq(ymd("2015-01-01"), by = "month", length.out = nrow(Rainfall_Runoff_Model)))
 
+# Add observed values -- left join
+
+Observed_values$Date <- as.Date(Observed_values$Date)
+
+# Select only the 'flow_perm3s' column from Observed_values and join it with Rainfall_Runoff_Model
+Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
+  left_join(Observed_values %>% select(Date, Observed_flow_m3pers), by = "Date")
+
+
 # PLOT!!!!!
 ggplot(Rainfall_Runoff_Model, aes(x = Date)) +
   geom_line(aes(y = Pred_mean_channel_discharge, color = "Predicted mean channel discharge"), size = 1) +
-  geom_line(aes(y = Observed_flow, color = "Observed flow"), size = 1, linetype = "dashed") +
+  geom_line(aes(y = Observed_flow_m3pers, color = "Observed monthly mean flow"), size = 1, linetype = "dashed") +
   labs(
-    title = "Rainfall and Runoff Over Time",
-    x = "Date",
-    y = "Flow (m³)",
+    x = "Year",
+    y = "Flow (m³/s)",
     color = "Legend"
   ) +
-  scale_color_manual(values = c("Predicted mean channel discharge" = "blue", "Observed flow" = "red")) +
-  theme_minimal()
+  scale_color_viridis(discrete = TRUE) +
+  theme_bw() +
+  theme(
+  panel.grid = element_blank())
+
+
 
 # YAYYY
 
