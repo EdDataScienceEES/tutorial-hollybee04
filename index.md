@@ -55,6 +55,8 @@ Let's zoom right out and look at the Hydrological cycle.
   <img src="Figures/Hydrologic_cycle.png" width="700" height="400">
 </div>
 
+*Figure 1: Hydrological Model (Kansas Geological Survey, 2024)*
+
 Here, we can see precipitation enters the system and either:
 - runs straight to the channel (surface runoff),
 - infiltrates into the ground
@@ -298,13 +300,15 @@ We're going to be using the `lubricate` package to note down the number of days 
 
 ```r
 
+# ---- Observed values ----
+
 # Calculate observed flow (m3/s)
 Observed_values <- Filtered_data %>%
   mutate(
     Days_in_month = days_in_month(ymd(paste(Year, MM, "01"))), # Get the number of days in the month
     Observed_flow_m3pers = Monthly_flow_m3 / (Days_in_month * 24 * 60 * 60) # Convert to m³/s
   ) %>%
-  group_by(Year, MM) %>%
+  group_by(Date, Year, MM) %>%
   summarize(
     Observed_flow_m3/s = first(Observed_flow_m3pers), # It's going to be the same value for every day of the month so let's only keep only one value per group
     .groups = "drop" # Ungroup after summarizing
@@ -320,10 +324,15 @@ ggplot(Observed_values, aes(x = MM, y = Observed_flow_m3pers, group = Year, colo
     y = "Observed flow (m³/s)",
     color = "Year"
   ) +
-  theme_minimal()
+  scale_color_viridis(discrete = TRUE) +  # Colorblind-friendly viridis palette
+  theme_bw() + # Border around figure
+  theme(
+     panel.grid = element_blank()) # Get rid of those grey lines
+
 ```
 
 <img src="{{ site.baseurl }}/Figures/Flow.month.png" alt="Observed flow against time" width="600"/>
+*Figure 2: Observed flow (m³/s) against time.*
 
 Okay. Here, we begin to realise the challenges with hydrological modelling. Our goal is to calibrate a model that works as best as possible for all three years. It might work perfectly for one year, but then if it doesn't for the other two years, then it's not exactly representative of the catchment. Ideally, you could use more years, perhaps over 10 or 20 years to gain a better perspective of changes and typical trends. 
 
@@ -332,19 +341,25 @@ Another way to visualise this data is by using `facet_wrap` which splits it up i
 ```r
 # Plotting with facet_wrap
 
-ggplot(Observed_values, aes(x = MM, y = Observed_flow)) +
-  geom_line(aes(group = Year, color = factor(Year))) + 
-  geom_point(aes(color = factor(Year))) +             
-  facet_wrap(~ Year) +   # Create a facet for each year.                          
+ggplot(Observed_values, aes(x = MM, y = Observed_flow_m3pers)) +
+  geom_line(aes(group = Year, color = factor(Year))) + # Line for each year
+  geom_point(aes(color = factor(Year))) +  # Points for clarity
+  facet_wrap(~ Year) +  # Create a facet for each year
   labs(
     x = "Month",
     y = "Observed Flow",
     color = "Year"
   ) +
-  theme_minimal()
+  scale_color_viridis(discrete = TRUE) +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank(),   
+    axis.text.x = element_text(angle = 60, hjust = 1)) # Tilt month names so they fit in better
+
 ```
 
   <img src="{{ site.baseurl }}/Figures/Flow.year.png" alt="Observed flow in 2015, 2016 and 2017" width="600"/>
+*Figure 3: Observed flow (m³/s) each year.*
 
 This enables us to view each year more easily. What can you notice about each one? Any similarities? Big differences?
 
@@ -352,58 +367,68 @@ This enables us to view each year more easily. What can you notice about each on
 - January flows of 2015 and 2016 are both pretty high.
 - Flow in 2017 is a lot lower than the previous 2 years. 
 
-# 5 ---- PARAMETERS ----
+<a name="4"></a>
+### 4. Parameters
 
+<a name="4a."></a>
+### 4a. Understanding how to decide parameter values
 
-# 5.1 Loss term 1 (L1) ----
+I think the easiest way to understand the parameters we're going to be using, is to get a grasp of the system. Below, shows the different pathways P (precipitation) can take. Take a moment to have a look at what's going on and then I'll explain how the different parameters fit into this. 
+
+  <img src="{{ site.baseurl }}/Figures/Model.png" alt="Rainfall-Runoff model" width="600"/>
+*Figure 4: Rainfall-Runoff Model (Moore, 2007)*
+
+Look at P and follow the arrows downwards. The first thing we see is E (Evapotranspiration). How much precipitation is evapotranspirated? This will affect how much water is available for other pathways. This leads us to our first parameter:
+
+<a name="4b."></a>
+### 4b. L1
+
+Loss term 1! 
+This parameter will account for Et losses AND interception losses. This is the amount of precipitation that is intercepted by trees or plants on its way down. We will decide this by visualising Et data throughout the year, identify patterns and seasonal changes. For interception, we can use CEH to look at vegetation cover over the catchment. Is it mostly urban? rural? woodland? agriculture? 
+
+This catchment is mostly grassland and mountain/heath/bog. With a little amount of arable and woodland and very very small section of built-up areas.
+
+We will come back to figure 4 in a second, but let's decide our L1 parameter first!
+
+```r
+# ---- PARAMETERS ----
+
+# Loss term 1 (L1) ----
 
 # L1 = Amount of water that reaches the surface AFTER interception, AFTER evapotranspiration!!! 
-# 0.2 means 20% of water reaches the surface. 
-# 0.6 means 60% of water reaches the surface.
 
-# But hang on, its gonna differ seasonally. 
-# Lets look at Et levels throughout the years 
-# Set Month and year to a factor with the correct order
-Filtered_data <- Filtered_data %>%
-  mutate(
-    MM = factor(
-      MM,
-      levels = month.abb  # Levels set to the correct order (Jan, Feb, ..., Dec)
-    ),
-    Year = as.factor(Year)
-  )
-
-ggplot(Data, aes(x = MM, y = Et_mm, color = Year, group = Year)) + 
+ggplot(Filtered_data, aes(x = MM, y = Et_mm, color = Year, group = Year)) + 
   geom_point() +
-  labs(title = "Et Levels 2015-2017", 
+  labs(
        x = "Month", 
        y = "Evapotranspiration (mm)") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  scale_color_viridis(discrete = TRUE) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid = element_blank())
+```
+ 
+ <img src="{{ site.baseurl }}/Figures/Et.png" alt="Et 2015-2017" width="600"/>
+*Figure 5: Et from 2015-2017*
 
-# Nov-March low-none Et
-# March, Apr and Oct mid Et
-# Summer aka May-Aug VVV high!
+From this, we can see:
+- Nov-March there is low-no Et
+- March, Apr and Oct mid Et
+- Summer aka May-Aug VVV high!
 
-# So what does this mean?
-# More evapotranspiration = less rainfall reaching the ground. 
+So what does this mean? Well.. based on the Et graph, we may choose to separate into seasons.
 
-# Now, think about interception.
+- __November to March__ = Little Et, little interception by urban/woodland therefore we may expect a large amount of rainfall to reach the surface = __0.8__ (80% of rainfall reaches the surface. 20% is either intercepted or evapotranspires)
 
-# For this look at vegetation cover over the catchment on CEH. Is it mostly urban? rural? woodland? agriculture? 
-# CEH: Mostly grassland and mountain/heath/bog. With a little amount of arable and woodland and very very small section of built-up areas.
+- __April to May__ and __August to October__ = Mid Et = __0.5__
 
-# These 2 factors (Et and interception) help us decide a loss parameter for the model called L1. 
+- __June to July__ = VERY high Et = __0.2__ 
 
-# Based on the Et graph, we may choose to separate into seasons. 
 
-# So Nov-March = Little Et, little interception by urban/woodland therefore we may expect a large amount of rainfall to reach the surface. 
 
-# 0.8 = 80% of rainfall reaches the surface. 20% is either intercepted or evapotranspirated.
-
-# As for the other months, April-May and Aug-Oct with mid Et, a parameter of 0.5 may make more sense
-
-# And for June to July with v v v high Et, a parameter of 0.2 makes sense. 
+  <img src="{{ site.baseurl }}/Figures/Model.png" alt="Rainfall-Runoff model" width="600"/>
+*Figure 4: Rainfall-Runoff Model (Moore, 2007)*
 
 # 5.2 Surface to Channel (C1) ----
 
