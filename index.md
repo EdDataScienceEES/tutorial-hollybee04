@@ -375,7 +375,7 @@ This enables us to view each year more easily. What can you notice about each on
 
 I think the easiest way to understand the parameters we're going to be using, is to get a grasp of the system. Below, shows the different pathways P (precipitation) can take. Take a moment to have a look at what's going on and then I'll explain how the different parameters fit into this. 
 
-  <img src="{{ site.baseurl }}/Figures/Model.png" alt="Rainfall-Runoff model" width="600"/>
+  <img src="{{ site.baseurl }}/Figures/Model.jpg" alt="Rainfall-Runoff model" width="600"/>
 *Figure 4: Rainfall-Runoff Model (Moore, 2007)*
 
 Look at P and follow the arrows downwards. The first thing we see is E (Evapotranspiration). How much precipitation is evapotranspirated? This will affect how much water is available for other pathways. This leads us to our first parameter:
@@ -427,7 +427,7 @@ So what does this mean? Well.. based on the Et graph, we may choose to separate 
 
 
 
-  <img src="{{ site.baseurl }}/Figures/Model.png" alt="Rainfall-Runoff model" width="600"/>
+  <img src="{{ site.baseurl }}/Figures/Model.jpg" alt="Rainfall-Runoff model" width="600"/>
 *Figure 4: Rainfall-Runoff Model (Moore, 2007)*
 
 # 5.2 Surface to Channel (C1) ----
