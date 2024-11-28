@@ -95,7 +95,7 @@ If you don't have much experience with R, you should check out some of the Codin
 # Written by ...
 # Date 
 
----- Library ----
+#---- Library ----
 
 library(nasapower) # for downloading evapotranspiration data 
 library(dplyr) # for data manipulation
@@ -103,7 +103,7 @@ library(ggplot2) # for data visualisation
 library(lubridate) # for data handling
 library(viridis) # colour blind friendly palette
 
----- Load data ----
+#---- Load data ----
 
 Flow <- read.csv("data/Daily_flow.csv")
 Precipitation <- read.csv("data/Rainfall_Data.csv")
@@ -130,7 +130,7 @@ If you were to pick a different catchment, you would download data specific to t
 ### 2b. Remove metadata, name and select columns
 
 ```r
----- Data preparation ----
+#---- Data preparation ----
 
 # Remove first 19 rows of metadata
 
@@ -174,7 +174,7 @@ Why I love `left_join()`:
 It's really easy to use and allows you to combine data sets together, but specifically when you want to keep the rows from the left data frame and add matching values from the right data frame. Where values don't match, an NA will appear. This is useful when you have collected data on multiple different variables and so you have may have separate data frames.
 
 ```r
-Merge 3 datasets ----
+# Merge 3 datasets ----
 
 # First merge flow and precipitation data together by matching dates 
 
@@ -307,7 +307,7 @@ Observed_values <- Filtered_data %>%
   ) %>%
   group_by(Date, Year, MM) %>%
   summarize(
-    Observed_flow_m3/s = first(Observed_flow_m3pers), # It's going to be the same value for every day of the month so let's only keep only one value per group
+    Observed_flow_m3pers = first(Observed_flow_m3pers), # It's going to be the same value for every day of the month so let's only keep only one value per group
     .groups = "drop" # Ungroup after summarizing
   )
 
