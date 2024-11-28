@@ -43,7 +43,7 @@ tags: modelling
 #### <a href="#6"> 6. Time to compare predicted values VS. observed values</a>
 
 > **_TIP:_**
-All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>. Click code, download the URL and paste in a new project in R Studio. 
+All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>. The datasets are in the 'Data' folder. Click code, download the URL and paste in a new project in R Studio. 
 Open a new script, write a title, your name, the date and load in the packages and data. Throughout this tutorial you can copy the code boxes into your own script. Remember # give extra context and explain what the code is doing! 
 
 
@@ -95,7 +95,7 @@ If you don't have much experience with R, you should check out some of the Codin
 # Written by ...
 # Date 
 
----- Library ----
+#---- Library ----
 
 library(nasapower) # for downloading evapotranspiration data 
 library(dplyr) # for data manipulation
@@ -103,7 +103,7 @@ library(ggplot2) # for data visualisation
 library(lubridate) # for data handling
 library(viridis) # colour blind friendly palette
 
----- Load data ----
+#---- Load data ----
 
 Flow <- read.csv("data/Daily_flow.csv")
 Precipitation <- read.csv("data/Rainfall_Data.csv")
@@ -130,7 +130,7 @@ If you were to pick a different catchment, you would download data specific to t
 ### 2b. Remove metadata, name and select columns
 
 ```r
----- Data preparation ----
+#---- Data preparation ----
 
 # Remove first 19 rows of metadata
 
@@ -174,7 +174,7 @@ Why I love `left_join()`:
 It's really easy to use and allows you to combine data sets together, but specifically when you want to keep the rows from the left data frame and add matching values from the right data frame. Where values don't match, an NA will appear. This is useful when you have collected data on multiple different variables and so you have may have separate data frames.
 
 ```r
-Merge 3 datasets ----
+# Merge 3 datasets ----
 
 # First merge flow and precipitation data together by matching dates 
 
@@ -307,7 +307,7 @@ Observed_values <- Filtered_data %>%
   ) %>%
   group_by(Date, Year, MM) %>%
   summarize(
-    Observed_flow_m3/s = first(Observed_flow_m3pers), # It's going to be the same value for every day of the month so let's only keep only one value per group
+    Observed_flow_m3pers = first(Observed_flow_m3pers), # It's going to be the same value for every day of the month so let's only keep only one value per group
     .groups = "drop" # Ungroup after summarizing
   )
 
@@ -406,7 +406,7 @@ ggplot(Filtered_data, aes(x = MM, y = Et_mm, color = Year, group = Year)) +
 ```
  
  <img src="{{ site.baseurl }}/Figures/Et.png" alt="Et 2015-2017" width="600"/>
-*Figure 5: Et from 2015-2017*
+*Figure 6: Et from 2015-2017*
 
 From this, we can see:
 - November to March there is low-no Et
@@ -425,7 +425,7 @@ So what does this mean? Well.. based on the Et graph, we may choose to separate 
 Okay now lets think about what happens to precipitation when it hits the surface. It's either going to infiltrate into the ground (__C2__) or run straight to the channel, over the surface as surface runoff (__C1__). 
 
   <img src="{{ site.baseurl }}/Figures/Model.jpg" alt="Rainfall-Runoff model" width="600"/>
-*Figure 4: Rainfall-Runoff Model (Moore, 2007)*
+*Figure 7: Rainfall-Runoff Model (Moore, 2007)*
 
 For this, we need to be thinking about:
 - __TOPOGRAPHY__: UPLAND = STEEP = FAST RUNOFF
@@ -597,7 +597,7 @@ ggplot(Rainfall_Runoff_Model, aes(x = Date)) +
 ```
 
   <img src="{{ site.baseurl }}/Figures/Final.plot.png" alt="Predicted flow against observed flow" width="900"/>
-*Figure 7: Predicted flow against observed flow (m3/s)*
+*Figure 8: Predicted flow against observed flow (m3/s)*
 
 Great! Let's have a wee look. 
 
