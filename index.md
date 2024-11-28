@@ -406,7 +406,7 @@ ggplot(Filtered_data, aes(x = MM, y = Et_mm, color = Year, group = Year)) +
 ```
  
  <img src="{{ site.baseurl }}/Figures/Et.png" alt="Et 2015-2017" width="600"/>
-*Figure 5: Et from 2015-2017*
+*Figure 6: Et from 2015-2017*
 
 From this, we can see:
 - November to March there is low-no Et
@@ -425,7 +425,7 @@ So what does this mean? Well.. based on the Et graph, we may choose to separate 
 Okay now lets think about what happens to precipitation when it hits the surface. It's either going to infiltrate into the ground (__C2__) or run straight to the channel, over the surface as surface runoff (__C1__). 
 
   <img src="{{ site.baseurl }}/Figures/Model.jpg" alt="Rainfall-Runoff model" width="600"/>
-*Figure 4: Rainfall-Runoff Model (Moore, 2007)*
+*Figure 7: Rainfall-Runoff Model (Moore, 2007)*
 
 For this, we need to be thinking about:
 - __TOPOGRAPHY__: UPLAND = STEEP = FAST RUNOFF
@@ -597,7 +597,7 @@ ggplot(Rainfall_Runoff_Model, aes(x = Date)) +
 ```
 
   <img src="{{ site.baseurl }}/Figures/Final.plot.png" alt="Predicted flow against observed flow" width="900"/>
-*Figure 7: Predicted flow against observed flow (m3/s)*
+*Figure 8: Predicted flow against observed flow (m3/s)*
 
 Great! Let's have a wee look. 
 
