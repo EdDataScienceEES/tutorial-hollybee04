@@ -43,7 +43,7 @@ tags: modelling
 #### <a href="#6"> 6. Time to compare predicted values VS. observed values</a>
 
 > **_TIP:_**
-All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>. Click code, download the URL and paste in a new project in R Studio. 
+All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>. The datasets are in the 'Data' folder. Click code, download the URL and paste in a new project in R Studio. 
 Open a new script, write a title, your name, the date and load in the packages and data. Throughout this tutorial you can copy the code boxes into your own script. Remember # give extra context and explain what the code is doing! 
 
 
