@@ -20,17 +20,17 @@ tags: modelling
 
 ## Tutorial Steps:
 
-## <a href="#1"> 1. What is a Rainfall-Runoff Model?</a>
+#### <a href="#1"> 1. What is a Rainfall-Runoff Model?</a>
 
-## <a href="#2"> 2. Data preparation</a>
+#### <a href="#2"> 2. Data preparation</a>
 
-## <a href="#3"> 3. Visualising observed flow values</a>
+#### <a href="#3"> 3. Visualising observed flow values</a>
 
-## <a href="#4"> 4. Parameters</a>
+#### <a href="#4"> 4. Parameters</a>
 
-## <a href="#5"> 5. Building the model</a>
+#### <a href="#5"> 5. Building the model</a>
 
-## <a href="#6"> 6. Time to compare predicted values VS. observed values</a>
+#### <a href="#6"> 6. Time to compare predicted values VS. observed values</a>
 
 > **_TIP:_**
 All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>. Click code, download the URL and paste in a new project in R Studio. 
@@ -56,9 +56,9 @@ Here, we can see precipitation enters the system and either:
 - Infiltrates into the ground
 - Or returns to the atmosphere through evapotranspiration.
 
-So.. what if we created a model that could predict the average flow of water through a river each month in any year. 
+So... what if we created a model that could predict the average flow of water through a river channel, each month in ANY year. 
 
-### 1a. Why do we want to do this?
+### 1a. Why would we want to do this?
 
 Runoff models aim to successfully track changes in water availability, floods and droughts over time (Jehanzaib et al, 2022). 
 
@@ -364,7 +364,7 @@ I think the easiest way to understand the parameters we're going to be using, is
 
 Look at P and follow the arrows downwards. The first thing we see is E (Evapotranspiration). This will affect how much water is available for other pathways. This leads us to our first parameter:
 
-# L1
+### L1
 
 Loss term 1! 
 This parameter will account for Et losses AND interception losses. This is the amount of precipitation that is intercepted by trees or plants on its way down. We will decide this by visualising Et data throughout the year, identify patterns and seasonal changes. For interception, we can use CEH to look at vegetation cover over the catchment. Is it mostly urban? rural? woodland? agriculture? 
@@ -408,7 +408,7 @@ So what does this mean? Well.. based on the Et graph, we may choose to separate 
 
 - June to July = VERY high Et = __0.2__ 
 
-# Surface to channel (C1)
+### Surface to channel (C1)
 
 Okay now lets think about what happens to precipitation when it hits the surface. It's either going to infiltrate into the ground (__C2__) or run straight to the channel, over the surface as surface runoff (__C1__). 
 
@@ -427,7 +427,7 @@ __C1 = 0.6__ (meaning 60% of water goes straight to the channel).
 
 > **_TIP:_** As we're keeping this model pretty simple, we're going to assume it remains the same throughout the whole year. But, if you were to create a model of your own, you might want to consider changing this value seasonally with changes in groundwater and soil moisture storage, which may differ throughout the year and therefore have an affect on C2 (infiltration) rates, ultimately affecting C1 as well! 
 
-# Surface to ground (C2)
+### Surface to ground (C2)
 
 __C2__ represents the fraction of water in the surface storage that infiltrates into the groundwater storage. Factors that influence this include, soil type, vegetation cover and the intensity of rainfall. 
 
@@ -440,13 +440,13 @@ __C2 = 0.3__
 
 > **_TIP:_** __C1__ and __C2__ CAN NOT = 1 because this means that 100% of water is either going straight to the channel or leaving the surface storage, leaving the surface storage completely empty for the next month - not realistic! 
 
-# Ground to channel (C3)
+### Ground to channel (C3)
 
 This is baseflow and C2 will represent the fraction of water in the groundwater storage that flows into the channel through the ground. C3 can be difficult to get right as it relies on having further knowledge on the trends in groundwater recharge and soil moisture change throughout the year. This might be slighty beyound this tutorial, but if you were to build your own model, you would research into this and perhaps have more information on this area. But for now, we will give it a parameter of 0.3 due to the low permeability of the soil, making it difficult for water to move through it. 
 
 __C3 = 0.3__
 
-# L2
+### L2
 
 This is loss term 2 and it represents the portion of water that is lost through leakage. Again, this is difficult to control for and requires further research on the catchment. For now, we will give it a parameter of 0.2, stating that 20% of groundwater storage leaks out to the wider area. 
 
@@ -583,4 +583,22 @@ ggplot(Rainfall_Runoff_Model, aes(x = Date)) +
 
   <img src="{{ site.baseurl }}/Figures/Final.plot.png" alt="Predicted flow against observed flow" width="900"/>
 *Figure 6: Predicted flow against observed flow (m3/s)*
+
+Great! Let's have a wee look. 
+
+The dark line represents the real flow values of the Tweed catchment. The yellow line represents our predicted model values based on parameters values, chosen based on typical hydrological processes and characteristics of the catchment. 
+
+As we can see, our observed yellow line tends to over predict, suggesting our parameters are slightly off and the model will require further calibration. Despite this, we can see the model matching certain trends for example, it manages to capture peaks in flow at the start of 2015, 2016 and 2017, as well as other peaks. 
+
+This is the first step in the calibration process. After this, you would continue tweaking the parameters and understanding the hydrological processes involved until you managed to match up the lines more!
+
+Once you've done this, you choose a different year (that you've not calibrated on) to __VALIDATE__ your model. This is you going, okay I've created this Rainfall-Runoff Model for the Tweed at Peebles catchment based on the years 2015-17, AND it can work for other years as well. 
+
+Well done!! You've reached the end of this tutorial. 
+
+#### I hope you have:
+
+1. Learned the importance of Rainfall-Runoff models, what they do and why we need them.
+2. Understood how we decide model parameters.
+3. You are now confident in how to create a Rainfall-Runoff model and you're ready to try and make your own!
 
