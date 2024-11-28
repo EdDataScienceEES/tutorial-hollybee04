@@ -28,15 +28,15 @@ tags: modelling
 
 #### <a href="#4"> 4. Parameters</a>
 
-##### <a href="#4"> Loss term 1 (L1)</a>
+##### <a href="#4"> 4b. Loss term 1 (L1)</a>
 
-##### <a href="#4"> Surface to channel (C1)</a>
+##### <a href="#4"> 4c. Surface to channel (C1)</a>
 
-##### <a href="#4"> Surface to ground (C2)</a>
+##### <a href="#4"> 4d. Surface to ground (C2)</a>
 
-##### <a href="#4"> Ground to channel (C3)</a>
+##### <a href="#4"> 4e. Ground to channel (C3)</a>
 
-##### <a href="#4"> Loss term 2 (L2)</a>
+##### <a href="#4"> 4f. Loss term 2 (L2)</a>
 
 #### <a href="#5"> 5. Building the model</a>
 
@@ -369,7 +369,6 @@ This enables us to view each year more easily. What can you notice about each on
 <a name="4"></a>
 ## 4. Parameters
 
-<a name="4a."></a>
 ### 4a. Understanding how to decide parameter values
 
 I think the easiest way to understand the parameters we're going to be using, is to get a grasp of the system. Below, shows the different pathways P (precipitation) can take. Take a moment to have a look at what's going on and then I'll explain how the different parameters fit into this. 
@@ -380,7 +379,7 @@ I think the easiest way to understand the parameters we're going to be using, is
 Look at P and follow the arrows downwards. The first thing we see is E (Evapotranspiration). This will affect how much water is available for other pathways. This leads us to our first parameter:
 
 <a name="4b."></a>
-### L1
+### 4b. Loss term 1 (L1)
 
 Loss term 1! 
 This parameter will account for Et losses AND interception losses. This is the amount of precipitation that is intercepted by trees or plants on its way down. We will decide this by visualising Et data throughout the year, identify patterns and seasonal changes. For interception, we can use CEH to look at vegetation cover over the catchment. Is it mostly urban? rural? woodland? agriculture? 
