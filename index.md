@@ -7,8 +7,8 @@ author: Holly Bacon
 tags: modelling      
 ---
 
-<div style="text-align: center;">
-  <img src="Figures/Hydrologic_cycle.png" width="700" height="400">
+<div style="text-align: center; width: 100%; overflow: hidden;">
+  <img src="Figures/Tut_title.png" style="width: 100%; height: auto;" alt="Tutorial Title Banner">
 </div>
 
 
