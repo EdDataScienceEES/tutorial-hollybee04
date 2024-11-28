@@ -28,6 +28,16 @@ tags: modelling
 
 #### <a href="#4"> 4. Parameters</a>
 
+##### <a href="#4"> Loss term 1 (L1)</a>
+
+##### <a href="#4"> Surface to channel (C1)</a>
+
+##### <a href="#4"> Surface to ground (C2)</a>
+
+##### <a href="#4"> Ground to channel (C3)</a>
+
+##### <a href="#4"> Loss term 2 (L2)</a>
+
 #### <a href="#5"> 5. Building the model</a>
 
 #### <a href="#6"> 6. Time to compare predicted values VS. observed values</a>
@@ -74,6 +84,11 @@ If you don't have much experience with R, you should check out some of the Codin
 ## 2. Data preparation  
 
 [The UK Centre for Ecology and Hydrology (CEH)](https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
+
+<div style="text-align: center;">
+  <img src="Figures/Tweed.png" width="500" height="100">
+</div>
+*Figure 1: River Tweed catchment*
 
 <a name="2"></a>
 ### 2a. Install packages and load data
@@ -364,6 +379,7 @@ I think the easiest way to understand the parameters we're going to be using, is
 
 Look at P and follow the arrows downwards. The first thing we see is E (Evapotranspiration). This will affect how much water is available for other pathways. This leads us to our first parameter:
 
+<a name="4b."></a>
 ### L1
 
 Loss term 1! 
@@ -396,18 +412,17 @@ ggplot(Filtered_data, aes(x = MM, y = Et_mm, color = Year, group = Year)) +
 *Figure 5: Et from 2015-2017*
 
 From this, we can see:
-- Nov-March there is low-no Et
-- March, Apr and Oct mid Et
-- Summer aka May-Aug VVV high!
+- November to March there is low-no Et
+- March, April and October mid Et
+- Summer aka May to August VVV high!
 
 So what does this mean? Well.. based on the Et graph, we may choose to separate into seasons.
 
 - November to March = Little Et, little interception by urban/woodland therefore we may expect a large amount of rainfall to reach the surface = __0.8__ (80% of rainfall reaches the surface. 20% is either intercepted or evapotranspires)
-
 - April to May and August to October = Mid Et = __0.5__
-
 - June to July = VERY high Et = __0.2__ 
 
+<a name="4c."></a>
 ### Surface to channel (C1)
 
 Okay now lets think about what happens to precipitation when it hits the surface. It's either going to infiltrate into the ground (__C2__) or run straight to the channel, over the surface as surface runoff (__C1__). 
@@ -427,6 +442,7 @@ __C1 = 0.6__ (meaning 60% of water goes straight to the channel).
 
 > **_TIP:_** As we're keeping this model pretty simple, we're going to assume it remains the same throughout the whole year. But, if you were to create a model of your own, you might want to consider changing this value seasonally with changes in groundwater and soil moisture storage, which may differ throughout the year and therefore have an affect on C2 (infiltration) rates, ultimately affecting C1 as well! 
 
+<a name="4d."></a>
 ### Surface to ground (C2)
 
 __C2__ represents the fraction of water in the surface storage that infiltrates into the groundwater storage. Factors that influence this include, soil type, vegetation cover and the intensity of rainfall. 
@@ -440,12 +456,14 @@ __C2 = 0.3__
 
 > **_TIP:_** __C1__ and __C2__ CAN NOT = 1 because this means that 100% of water is either going straight to the channel or leaving the surface storage, leaving the surface storage completely empty for the next month - not realistic! 
 
+<a name="4e."></a>
 ### Ground to channel (C3)
 
 This is baseflow and C2 will represent the fraction of water in the groundwater storage that flows into the channel through the ground. C3 can be difficult to get right as it relies on having further knowledge on the trends in groundwater recharge and soil moisture change throughout the year. This might be slighty beyound this tutorial, but if you were to build your own model, you would research into this and perhaps have more information on this area. But for now, we will give it a parameter of 0.3 due to the low permeability of the soil, making it difficult for water to move through it. 
 
 __C3 = 0.3__
 
+<a name="4f."></a>
 ### L2
 
 This is loss term 2 and it represents the portion of water that is lost through leakage. Again, this is difficult to control for and requires further research on the catchment. For now, we will give it a parameter of 0.2, stating that 20% of groundwater storage leaks out to the wider area. 
@@ -588,7 +606,7 @@ Great! Let's have a wee look.
 
 The dark line represents the real flow values of the Tweed catchment. The yellow line represents our predicted model values based on parameters values, chosen based on typical hydrological processes and characteristics of the catchment. 
 
-As we can see, our observed yellow line tends to over predict, suggesting our parameters are slightly off and the model will require further calibration. Despite this, we can see the model matching certain trends for example, it manages to capture peaks in flow at the start of 2015, 2016 and 2017, as well as other peaks. 
+As we can see, our predicted yellow line tends to over predict, suggesting our parameters are slightly off and the model will require further calibration. Despite this, we can see the model matching certain trends for example, it manages to capture peaks in flow at the start of 2015, 2016 and 2017, as well as other peaks. 
 
 This is the first step in the calibration process. After this, you would continue tweaking the parameters and understanding the hydrological processes involved until you managed to match up the lines more!
 
@@ -596,9 +614,19 @@ Once you've done this, you choose a different year (that you've not calibrated o
 
 Well done!! You've reached the end of this tutorial. 
 
-#### I hope you have:
+### I hope you have:
 
 1. Learned the importance of Rainfall-Runoff models, what they do and why we need them.
 2. Understood how we decide model parameters.
 3. You are now confident in how to create a Rainfall-Runoff model and you're ready to try and make your own!
 
+## BONUS!
+
+If you're feeling up for it, head over to the [CEH](https://nrfa.ceh.ac.uk/data/search) website, pick ANY catchment, download the data and create your own model for that catchment! 
+
+## Good luck!
+
+
+
+
+(References can be found in the 'References' folder in this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>).
