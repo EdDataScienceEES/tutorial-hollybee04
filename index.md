@@ -6,10 +6,11 @@ date: 2024-26-11 10:00:00
 author: Holly Bacon
 tags: modelling      
 ---
-<div class="block">
-	<center>
-		<img src="{{ site.baseurl }}/Figures/Tut_title.png" alt="Img">
-	</center>
+
+<div style="text-align: center;">
+  <img src="Figures/Hydrologic_cycle.png" width="700" height="400">
+</div>
+
 
 ## Tutorial Aims:
 
