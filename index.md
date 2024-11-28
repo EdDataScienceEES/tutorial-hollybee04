@@ -581,6 +581,6 @@ ggplot(Rainfall_Runoff_Model, aes(x = Date)) +
   panel.grid = element_blank())
 ```
 
-  <img src="{{ site.baseurl }}/Figures/Final.plot.png" alt="Predicted flow against observed flow" width="600"/>
+  <img src="{{ site.baseurl }}/Figures/Final.plot.png" alt="Predicted flow against observed flow" width="900"/>
 *Figure 6: Predicted flow against observed flow (m3/s)*
 
