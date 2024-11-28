@@ -85,10 +85,8 @@ If you don't have much experience with R, you should check out some of the Codin
 
 [The UK Centre for Ecology and Hydrology (CEH)](https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
 
-<div style="text-align: center;">
-  <img src="Figures/Tweed.png" width="500" height="100">
-</div>
-*Figure 1: River Tweed catchment*
+<img src="{{ site.baseurl }}/Figures/Tweed.png" alt="Tweed catchment" width="600"/>
+*Figure 2: Tweed Catchment (Rivertweed.org.uk, 2024)*
 
 <a name="2"></a>
 ### 2a. Install packages and load data
@@ -331,7 +329,7 @@ ggplot(Observed_values, aes(x = MM, y = Observed_flow_m3pers, group = Year, colo
 ```
 
 <img src="{{ site.baseurl }}/Figures/Flow.month.png" alt="Observed flow against time" width="600"/>
-*Figure 2: Observed flow (m³/s) against time.*
+*Figure 3: Observed flow (m³/s) against time.*
 
 Okay. Here, we begin to realise the challenges with hydrological modelling. Our goal is to calibrate a model that works as best as possible for all three years. It might work perfectly for one year, but then if it doesn't for the other two years, then it's not exactly representative of the catchment. Ideally, you could use more years, perhaps over 10 or 20 years to gain a better perspective of changes and typical trends. 
 
@@ -358,7 +356,7 @@ ggplot(Observed_values, aes(x = MM, y = Observed_flow_m3pers)) +
 ```
 
   <img src="{{ site.baseurl }}/Figures/Flow.year.png" alt="Observed flow in 2015, 2016 and 2017" width="600"/>
-*Figure 3: Observed flow (m³/s) each year.*
+*Figure 4: Observed flow (m³/s) each year.*
 
 This enables us to view each year more easily. What can you notice about each one? Any similarities? Big differences?
 
@@ -374,7 +372,7 @@ This enables us to view each year more easily. What can you notice about each on
 I think the easiest way to understand the parameters we're going to be using, is to get a grasp of the system. Below, shows the different pathways P (precipitation) can take. Take a moment to have a look at what's going on and then I'll explain how the different parameters fit into this. 
 
   <img src="{{ site.baseurl }}/Figures/Model.jpg" alt="Rainfall-Runoff model" width="600"/>
-*Figure 4: Rainfall-Runoff Model (Moore, 2007)*
+*Figure 5: Rainfall-Runoff Model (Moore, 2007)*
 
 Look at P and follow the arrows downwards. The first thing we see is E (Evapotranspiration). This will affect how much water is available for other pathways. This leads us to our first parameter:
 
@@ -447,7 +445,7 @@ __C1 = 0.6__ (meaning 60% of water goes straight to the channel).
 __C2__ represents the fraction of water in the surface storage that infiltrates into the groundwater storage. Factors that influence this include, soil type, vegetation cover and the intensity of rainfall. 
 
   <img src="{{ site.baseurl }}/Figures/Geology.png" alt="Catchment geology" width="600"/>
-*Figure 5: Catchment geology (UK Centre for Ecology and Hydrology, 2024)*
+*Figure 6: Catchment geology (UK Centre for Ecology and Hydrology, 2024)*
 
 Figure 5 displays geology at the Tweed Catchment. We can see that 87% of the bedrock is very low permeability, suggesting a low C2 value, also considering the upland nature of the catchment. 
 
@@ -599,7 +597,7 @@ ggplot(Rainfall_Runoff_Model, aes(x = Date)) +
 ```
 
   <img src="{{ site.baseurl }}/Figures/Final.plot.png" alt="Predicted flow against observed flow" width="900"/>
-*Figure 6: Predicted flow against observed flow (m3/s)*
+*Figure 7: Predicted flow against observed flow (m3/s)*
 
 Great! Let's have a wee look. 
 
