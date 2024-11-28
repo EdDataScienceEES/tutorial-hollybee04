@@ -445,9 +445,9 @@ __C1 = 0.6__ (meaning 60% of water goes straight to the channel).
 __C2__ represents the fraction of water in the surface storage that infiltrates into the groundwater storage. Factors that influence this include, soil type, vegetation cover and the intensity of rainfall. 
 
   <img src="{{ site.baseurl }}/Figures/Geology.png" alt="Catchment geology" width="600"/>
-*Figure 6: Catchment geology (UK Centre for Ecology and Hydrology, 2024)*
+*Figure 8: Catchment geology (UK Centre for Ecology and Hydrology, 2024)*
 
-Figure 5 displays geology at the Tweed Catchment. We can see that 87% of the bedrock is very low permeability, suggesting a low C2 value, also considering the upland nature of the catchment. 
+Figure 8 displays geology at the Tweed Catchment. We can see that 87% of the bedrock is very low permeability, suggesting a low C2 value, also considering the upland nature of the catchment. 
 
 __C2 = 0.3__ 
 
@@ -597,7 +597,7 @@ ggplot(Rainfall_Runoff_Model, aes(x = Date)) +
 ```
 
   <img src="{{ site.baseurl }}/Figures/Final.plot.png" alt="Predicted flow against observed flow" width="900"/>
-*Figure 8: Predicted flow against observed flow (m3/s)*
+*Figure 9: Predicted flow against observed flow (m3/s)*
 
 Great! Let's have a wee look. 
 
