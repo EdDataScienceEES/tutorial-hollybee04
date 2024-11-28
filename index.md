@@ -83,7 +83,7 @@ If you don't have much experience with R, you should check out some of the Codin
 
 ## 2. Data preparation  
 
-[The UK Centre for Ecology and Hydrology (CEH)](https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
+[The UK Centre for Ecology and Hydrology (CEH)](https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed catchment.
 
 <img src="{{ site.baseurl }}/Figures/Tweed.png" alt="Tweed catchment" width="600"/>
 *Figure 2: Tweed Catchment (Rivertweed.org.uk, 2024)*
