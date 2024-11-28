@@ -22,39 +22,18 @@ tags: modelling
 
 ## <a href="#1"> 1. What is a Rainfall-Runoff Model?</a>
 
-#### <a href="#1.2"> 1a. Why do we want to do this?</a>
-
 ## <a href="#2"> 2. Data preparation</a>
-
-#### <a href="#2"> 2a. Install packages and load data</a>
-
-#### <a href="#2"> 2b. Remove metadata, name and select columns</a>
-
-#### <a href="#2"> 2c. Using `left_join()` to merge datasets</a>
-
-#### <a href="#2"> 2d. Filter dataset to 2015-2017</a>
-
-#### <a href="#2"> 2e. Fix up the units</a>
 
 ## <a href="#3"> 3. Visualising observed flow values</a>
 
 ## <a href="#4"> 4. Parameters</a>
 
-#### <a href="#4"> 4a. Understanding how to decide parameter values</a>
-
-#### <a href="#4"> 4b. L1</a>
-
-#### <a href="#4"> 4c. Surface to channel (C1)</a>
-
-#### <a href="#4"> 4d. Surface to ground (C2)</a>
-
-#### <a href="#4"> 4e. Ground to channel (C3)</a>
-
-#### <a href="#4"> 4f. L2</a>
-
 ## <a href="#5"> 5. Building the model</a>
 
 ## <a href="#6"> 6. Time to compare predicted values VS. observed values</a>
+
+
+
 
 
 <a name="1"></a>
@@ -77,7 +56,6 @@ Here, we can see precipitation enters the system and either:
 
 So.. what if we created a model that could predict the average flow of water through a river each month in any year. 
 
-<a name="1.2"></a>
 ### 1a. Why do we want to do this?
 
 Runoff models aim to successfully track changes in water availability, floods and droughts over time (Jehanzaib et al, 2022). 
@@ -91,7 +69,6 @@ Once validated, the model becomes a powerful resource. It can be used to predict
 > **_TIP:_**
 If you don't have much experience with R, you should check out some of the Coding Club tutorials such as, "Intro to R" (https://ourcodingclub.github.io/tutorials/intro-to-r/) to get a grip of the basics. This tutorial will also incorparate various functions from the `dplyr` package, therefore the "Basic data manipulation" tutorial (https://ourcodingclub.github.io/tutorials/data-manip-intro/) will also be very useful if you've never used the `dplyr` package before.
 
-<a name="2"></a>
 ## 2. Data preparation  
 
 > **_TIP:_**
@@ -100,7 +77,7 @@ Open a new script, write a title, your name, the date and load in the packages a
 
 The UK Centre for Ecology and Hydrology (https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
 
-<a name="2.1"></a>
+<a name="2"></a>
 ### 2a. Install packages and load data
 ```r
 # Tutorial: Understanding and Building a Rainfall-Runoff Model
@@ -139,7 +116,6 @@ Evapotranspiration <- get_power(
 
 If you were to pick a different catchment, you would download data specific to that area, including latitude and longitude values. I found these on google maps by matching up roughly where the rain guage was on CEH.
 
-<a name="2.2"></a>
 ### 2b. Remove metadata, name and select columns
 
 ```r
@@ -178,7 +154,6 @@ Evapotranspiration_clean$MM <- month.abb[Evapotranspiration_clean$MM] # Change t
 
 If you're confused what the pipes (`%>%`) are doing, head to the 'Efficient data manipulation' tutorial (https://ourcodingclub.github.io/tutorials/data-manip-efficient/) which introduces pipes. If you just need a quick reminder - pipes chain operations together in a more efficient and readable way! 
 
-<a name="2.3"></a>
 ### 2c. Using `left_join()` to merge datasets
 
 Great! Now we have all the data we need and it's pretty organised now. But it's all seperate. Lets combine the 3 datasets together using a cool `dplyr` function called `left_join` 
@@ -223,7 +198,6 @@ You can also use this when you need to change a column to a factor or numeric: `
 
 OKAY! Now we have one big data set containing all the information we need. What's next?
 
-<a name="2.4"></a>
 ### 2d. Filter dataset to 2015-2017
 
 Now we need to filter to the years we want to calibrate our model with (2015-2017). We can do this by using the `filter()` function which selects rows based on the conditions we set. 
@@ -240,7 +214,6 @@ Filtered_data <- Final_merged_data %>%
 - Condition 1: "Date >= as.Date("2015-01-01")" keeps rows where the Date column is greater than or equal to January 1st 2015. "as.Date" ensures date is treated as a date and not just text.
 - Condition 2: "Date <= as.Date("2017-12-31")" keeps rows where the Date column is less than or equal to December 31st 2017.
 
-<a name="2.5"></a>
 ### 2e. Fix up the units
 
 Now we have our dataset with all the information we need AND filtered to the right timeline. The next step is to ensure we have the correct units. In hydrological modelling we often use m to maintain consistency with other variables (such as flow). We can leave Et as it is as we are only going to be visualising Et trends to help us decide one of the parameters. 
@@ -393,7 +366,6 @@ I think the easiest way to understand the parameters we're going to be using, is
 
 Look at P and follow the arrows downwards. The first thing we see is E (Evapotranspiration). This will affect how much water is available for other pathways. This leads us to our first parameter:
 
-<a name="4b."></a>
 ### 4b. L1
 
 Loss term 1! 
@@ -438,7 +410,6 @@ So what does this mean? Well.. based on the Et graph, we may choose to separate 
 
 - __June to July__ = VERY high Et = __0.2__ 
 
-<a name="4c."></a>
 ### 4c. Surface to channel (C1)
 
 Okay now lets think about what happens to precipitation when it hits the surface. It's either going to infiltrate into the ground (__C2__) or run straight to the channel, over the surface as surface runoff (__C1__). 
@@ -458,7 +429,6 @@ __C1 = 0.6__ (meaning 60% of water goes straight to the channel).
 
 > **_TIP:_** As we're keeping this model pretty simple, we're going to assume it remains the same throughout the whole year. But, if you were to create a model of your own, you might want to consider changing this value seasonally with changes in groundwater and soil moisture storage, which may differ throughout the year and therefore have an affect on C2 (infiltration) rates, ultimately affecting C1 as well! 
 
-<a name="4d."></a>
 ### 4d. Surface to ground (C2)
 
 __C2__ represents the fraction of water in the surface storage that infiltrates into the groundwater storage. Factors that influence this include, soil type, vegetation cover and the intensity of rainfall. 
@@ -472,14 +442,12 @@ __C2 = 0.3__
 
 > **_TIP:_** __C1__ and __C2__ CAN NOT = 1 because this means that 100% of water is either going straight to the channel or leaving the surface storage, leaving the surface storage completely empty for the next month - not realistic! 
 
-<a name="4e."></a>
 ### 4e. Ground to channel (C3)
 
 This is baseflow and C2 will represent the fraction of water in the groundwater storage that flows into the channel through the ground. C3 can be difficult to get right as it relies on having further knowledge on the trends in groundwater recharge and soil moisture change throughout the year. This might be slighty beyound this tutorial, but if you were to build your own model, you would research into this and perhaps have more information on this area. But for now, we will give it a parameter of 0.3 due to the low permeability of the soil, making it difficult for water to move through it. 
 
 __C3 = 0.3__
 
-<a name="4f."></a>
 ### 4f. L2
 
 This is loss term 2 and it represents the portion of water that is lost through leakage. Again, this is difficult to control for and requires further research on the catchment. For now, we will give it a parameter of 0.2, stating that 20% of groundwater storage leaks out to the wider area. 
