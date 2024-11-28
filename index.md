@@ -364,7 +364,7 @@ I think the easiest way to understand the parameters we're going to be using, is
 
 Look at P and follow the arrows downwards. The first thing we see is E (Evapotranspiration). This will affect how much water is available for other pathways. This leads us to our first parameter:
 
-### 4b. L1
+# L1
 
 Loss term 1! 
 This parameter will account for Et losses AND interception losses. This is the amount of precipitation that is intercepted by trees or plants on its way down. We will decide this by visualising Et data throughout the year, identify patterns and seasonal changes. For interception, we can use CEH to look at vegetation cover over the catchment. Is it mostly urban? rural? woodland? agriculture? 
@@ -402,13 +402,13 @@ From this, we can see:
 
 So what does this mean? Well.. based on the Et graph, we may choose to separate into seasons.
 
-- __November to March__ = Little Et, little interception by urban/woodland therefore we may expect a large amount of rainfall to reach the surface = __0.8__ (80% of rainfall reaches the surface. 20% is either intercepted or evapotranspires)
+- November to March = Little Et, little interception by urban/woodland therefore we may expect a large amount of rainfall to reach the surface = __0.8__ (80% of rainfall reaches the surface. 20% is either intercepted or evapotranspires)
 
-- __April to May__ and __August to October__ = Mid Et = __0.5__
+- April to May and August to October = Mid Et = __0.5__
 
-- __June to July__ = VERY high Et = __0.2__ 
+- June to July = VERY high Et = __0.2__ 
 
-### 4c. Surface to channel (C1)
+# Surface to channel (C1)
 
 Okay now lets think about what happens to precipitation when it hits the surface. It's either going to infiltrate into the ground (__C2__) or run straight to the channel, over the surface as surface runoff (__C1__). 
 
@@ -427,7 +427,7 @@ __C1 = 0.6__ (meaning 60% of water goes straight to the channel).
 
 > **_TIP:_** As we're keeping this model pretty simple, we're going to assume it remains the same throughout the whole year. But, if you were to create a model of your own, you might want to consider changing this value seasonally with changes in groundwater and soil moisture storage, which may differ throughout the year and therefore have an affect on C2 (infiltration) rates, ultimately affecting C1 as well! 
 
-### 4d. Surface to ground (C2)
+# Surface to ground (C2)
 
 __C2__ represents the fraction of water in the surface storage that infiltrates into the groundwater storage. Factors that influence this include, soil type, vegetation cover and the intensity of rainfall. 
 
@@ -440,13 +440,13 @@ __C2 = 0.3__
 
 > **_TIP:_** __C1__ and __C2__ CAN NOT = 1 because this means that 100% of water is either going straight to the channel or leaving the surface storage, leaving the surface storage completely empty for the next month - not realistic! 
 
-### 4e. Ground to channel (C3)
+# Ground to channel (C3)
 
 This is baseflow and C2 will represent the fraction of water in the groundwater storage that flows into the channel through the ground. C3 can be difficult to get right as it relies on having further knowledge on the trends in groundwater recharge and soil moisture change throughout the year. This might be slighty beyound this tutorial, but if you were to build your own model, you would research into this and perhaps have more information on this area. But for now, we will give it a parameter of 0.3 due to the low permeability of the soil, making it difficult for water to move through it. 
 
 __C3 = 0.3__
 
-### 4f. L2
+# L2
 
 This is loss term 2 and it represents the portion of water that is lost through leakage. Again, this is difficult to control for and requires further research on the catchment. For now, we will give it a parameter of 0.2, stating that 20% of groundwater storage leaks out to the wider area. 
 
