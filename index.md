@@ -32,7 +32,9 @@ tags: modelling
 
 ## <a href="#6"> 6. Time to compare predicted values VS. observed values</a>
 
-
+> **_TIP:_**
+All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>. Click code, download the URL and paste in a new project in R Studio. 
+Open a new script, write a title, your name, the date and load in the packages and data. Throughout this tutorial you can copy the code boxes into your own script. Remember # give extra context and explain what the code is doing! 
 
 
 
@@ -67,15 +69,11 @@ At the end, the model will provide a predicted flow, which can be plotted agains
 Once validated, the model becomes a powerful resource. It can be used to predict future flow rates based on estimated precipitation levels, providing valuable insights for mitigating flood risks and improving water resource management. By simulating different scenarios, such as changes in land use or climate, hydrologists can use runoff models in decision-making and improve resilience to extreme climatic events.
 
 > **_TIP:_**
-If you don't have much experience with R, you should check out some of the Coding Club tutorials such as, "Intro to R" (https://ourcodingclub.github.io/tutorials/intro-to-r/) to get a grip of the basics. This tutorial will also incorparate various functions from the `dplyr` package, therefore the "Basic data manipulation" tutorial (https://ourcodingclub.github.io/tutorials/data-manip-intro/) will also be very useful if you've never used the `dplyr` package before.
+If you don't have much experience with R, you should check out some of the Coding Club tutorials such as, [Intro to R](https://ourcodingclub.github.io/tutorials/intro-to-r/) to get a grip of the basics. This tutorial will also incorparate various functions from the `dplyr` package, therefore the [Basic data manipulation](https://ourcodingclub.github.io/tutorials/data-manip-intro/) tutorial will also be very useful if you've never used the `dplyr` package before.
 
 ## 2. Data preparation  
 
-> **_TIP:_**
-All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>. Click code, download the URL and paste in a new project in R Studio. 
-Open a new script, write a title, your name, the date and load in the packages and data. Throughout this tutorial you can copy the code boxes into your own script. Remember # give extra context and explain what the code is doing! 
-
-The UK Centre for Ecology and Hydrology (https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
+[The UK Centre for Ecology and Hydrology (CEH)](https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
 
 <a name="2"></a>
 ### 2a. Install packages and load data
@@ -152,7 +150,7 @@ Evapotranspiration_clean$MM <- month.abb[Evapotranspiration_clean$MM] # Change t
 
 ```
 
-If you're confused what the pipes (`%>%`) are doing, head to the 'Efficient data manipulation' tutorial (https://ourcodingclub.github.io/tutorials/data-manip-efficient/) which introduces pipes. If you just need a quick reminder - pipes chain operations together in a more efficient and readable way! 
+If you're confused what the pipes (`%>%`) are doing, head to the [Efficient data manipulation](https://ourcodingclub.github.io/tutorials/data-manip-efficient/) tutorial which introduces pipes. If you just need a quick reminder - pipes chain operations together in a more efficient and readable way! 
 
 ### 2c. Using `left_join()` to merge datasets
 
@@ -421,7 +419,7 @@ For this, we need to be thinking about:
 - __TOPOGRAPHY__: UPLAND = STEEP = FAST RUNOFF
 - __SOIL TYPE__: Permeable or impermeable?
 
-Guess what! CEH contains everything we need! The catchment has low permeability, upland, but it does have floodplains which can store water in flood events, reducing runoff. In general, we would expect this parameter value to be high due to the low permeability, meaning less water will infiltrate and the upland topography promoting fast runoff. However, it does contain floodplains so we can't make the value too high. 
+Guess what! [CEH](https://nrfa.ceh.ac.uk/data/search) contains everything we need! The catchment has low permeability, upland, but it does have floodplains which can store water in flood events, reducing runoff. In general, we would expect this parameter value to be high due to the low permeability, meaning less water will infiltrate and the upland topography promoting fast runoff. However, it does contain floodplains so we can't make the value too high. 
 
 What do we think?
 
