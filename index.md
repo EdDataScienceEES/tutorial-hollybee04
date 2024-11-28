@@ -7,17 +7,10 @@ author: Holly Bacon
 tags: modelling      
 ---
 
-<div class="block">
-	<center>
-		<img src="{{ site.baseurl }}/Figures/Tut_title.png" alt="Img">
-	</center>
+<div style="text-align: center; width: 100%; overflow: hidden;">
+  <img src="Figures/Tut_title.png" style="width: 100%; height: auto;" alt="Tutorial Title Banner">
+</div>
 
- </div>
-<div style="text-align: center;">
-  <img src="Figures/Tut_title.png" width="1000" height="400">
-</div> 
-
-*Created by Holly Bacon* 
 
 ## Tutorial Aims:
 
@@ -29,23 +22,24 @@ tags: modelling
 
 ## <a href="#1"> 1. What is a Rainfall-Runoff Model?</a>
 
-#### <a href="#1.2"> 1a. Why do we want to do this?</a>
-
 ## <a href="#2"> 2. Data preparation</a>
 
-#### <a href="#2"> 2a. Install packages and load data</a>
+## <a href="#3"> 3. Visualising observed flow values</a>
 
-#### <a href="#2"> 2b. Remove metadata, name and select columns</a>
+## <a href="#4"> 4. Parameters</a>
 
-#### <a href="#2"> 2c. Using `left_join()` to merge datasets</a>
+## <a href="#5"> 5. Building the model</a>
 
-#### <a href="#2"> 2d. Filter dataset to 2015-2017</a>
+## <a href="#6"> 6. Time to compare predicted values VS. observed values</a>
 
-#### <a href="#2"> 2e. Fix up the units</a>
+> **_TIP:_**
+All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>. Click code, download the URL and paste in a new project in R Studio. 
+Open a new script, write a title, your name, the date and load in the packages and data. Throughout this tutorial you can copy the code boxes into your own script. Remember # give extra context and explain what the code is doing! 
+
 
 
 <a name="1"></a>
-### 1. What is a Rainfall-Runoff model?
+## 1. What is a Rainfall-Runoff model?
 
 Welcome! Here, you're going to learn the basis of creating a Rainfall-Runoff model. But, you might be wondering... okay but what is a Rainfall-Runoff model? If you're not familiar with this, that's okay. Let's go over it:
 
@@ -58,13 +52,12 @@ Let's zoom right out and look at the Hydrological cycle.
 *Figure 1: Hydrological Model (Kansas Geological Survey, 2024)*
 
 Here, we can see precipitation enters the system and either:
-- runs straight to the channel (surface runoff),
-- infiltrates into the ground
-- or evapotranspires back up.
+- Flows directly to the channel (surface runoff),
+- Infiltrates into the ground
+- Or returns to the atmosphere through evapotranspiration.
 
 So.. what if we created a model that could predict the average flow of water through a river each month in any year. 
 
-<a name="1.2"></a>
 ### 1a. Why do we want to do this?
 
 Runoff models aim to successfully track changes in water availability, floods and droughts over time (Jehanzaib et al, 2022). 
@@ -76,18 +69,13 @@ At the end, the model will provide a predicted flow, which can be plotted agains
 Once validated, the model becomes a powerful resource. It can be used to predict future flow rates based on estimated precipitation levels, providing valuable insights for mitigating flood risks and improving water resource management. By simulating different scenarios, such as changes in land use or climate, hydrologists can use runoff models in decision-making and improve resilience to extreme climatic events.
 
 > **_TIP:_**
-If you don't have much experience with R, you should check out some of the Coding Club tutorials such as, "Intro to R" (https://ourcodingclub.github.io/tutorials/intro-to-r/) to get a grip of the basics. This tutorial will also incorparate various functions from the `dplyr` package, therefore the "Basic data manipulation" tutorial (https://ourcodingclub.github.io/tutorials/data-manip-intro/) will also be very useful if you've never used the `dplyr` package before.
+If you don't have much experience with R, you should check out some of the Coding Club tutorials such as, [Intro to R](https://ourcodingclub.github.io/tutorials/intro-to-r/) to get a grip of the basics. This tutorial will also incorparate various functions from the `dplyr` package, therefore the [Basic data manipulation](https://ourcodingclub.github.io/tutorials/data-manip-intro/) tutorial will also be very useful if you've never used the `dplyr` package before.
+
+## 2. Data preparation  
+
+[The UK Centre for Ecology and Hydrology (CEH)](https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
 
 <a name="2"></a>
-### 2. Data preparation  
-
-> **_TIP:_**
-All the files you need to complete this tutorial can be downloaded from this <a href="https://github.com/EdDataScienceEES/tutorial-hollybee04.git" target="_blank" markdown="1">repository</a>. Click code, download the URL and paste in a new project in R Studio. 
-Open a new script, write a title, your name, the date and load in the packages and data. Throughout this tutorial you can copy the code boxes into your own script. Remember # give extra context and explain what the code is doing! 
-
-The UK Centre for Ecology and Hydrology (https://nrfa.ceh.ac.uk/data/search) collects precipitation and daily flow data across the whole of the UK, as well as detailed catchment info. For this tutorial, we're going to be using the Tweed at Peebles in Scotland. 
-
-<a name="2.1"></a>
 ### 2a. Install packages and load data
 ```r
 # Tutorial: Understanding and Building a Rainfall-Runoff Model
@@ -126,7 +114,6 @@ Evapotranspiration <- get_power(
 
 If you were to pick a different catchment, you would download data specific to that area, including latitude and longitude values. I found these on google maps by matching up roughly where the rain guage was on CEH.
 
-<a name="2.2"></a>
 ### 2b. Remove metadata, name and select columns
 
 ```r
@@ -163,9 +150,8 @@ Evapotranspiration_clean$MM <- month.abb[Evapotranspiration_clean$MM] # Change t
 
 ```
 
-If you're confused what the pipes (`%>%`) are doing, head to the 'Efficient data manipulation' tutorial (https://ourcodingclub.github.io/tutorials/data-manip-efficient/) which introduces pipes. If you just need a quick reminder - pipes chain operations together in a more efficient and readable way! 
+If you're confused what the pipes (`%>%`) are doing, head to the [Efficient data manipulation](https://ourcodingclub.github.io/tutorials/data-manip-efficient/) tutorial which introduces pipes. If you just need a quick reminder - pipes chain operations together in a more efficient and readable way! 
 
-<a name="2.3"></a>
 ### 2c. Using `left_join()` to merge datasets
 
 Great! Now we have all the data we need and it's pretty organised now. But it's all seperate. Lets combine the 3 datasets together using a cool `dplyr` function called `left_join` 
@@ -210,7 +196,6 @@ You can also use this when you need to change a column to a factor or numeric: `
 
 OKAY! Now we have one big data set containing all the information we need. What's next?
 
-<a name="2.4"></a>
 ### 2d. Filter dataset to 2015-2017
 
 Now we need to filter to the years we want to calibrate our model with (2015-2017). We can do this by using the `filter()` function which selects rows based on the conditions we set. 
@@ -227,7 +212,6 @@ Filtered_data <- Final_merged_data %>%
 - Condition 1: "Date >= as.Date("2015-01-01")" keeps rows where the Date column is greater than or equal to January 1st 2015. "as.Date" ensures date is treated as a date and not just text.
 - Condition 2: "Date <= as.Date("2017-12-31")" keeps rows where the Date column is less than or equal to December 31st 2017.
 
-<a name="2.5"></a>
 ### 2e. Fix up the units
 
 Now we have our dataset with all the information we need AND filtered to the right timeline. The next step is to ensure we have the correct units. In hydrological modelling we often use m to maintain consistency with other variables (such as flow). We can leave Et as it is as we are only going to be visualising Et trends to help us decide one of the parameters. 
@@ -290,7 +274,7 @@ ALWAYS remember to `ungroup()` after you're done with that operation to make sur
 PERFECT! Well done. Now, we have successfully prepared our data and we're almost ready to start building our model. Before we jump into creating the model, why not we plot out the observed ("real") flow values that were measured during 2015, 2016 and 2017 to get an idea of the general trends, similarities and differences between the three years. 
 
 <a name="3"></a>
-### 3. Visualising the observed flow values
+## 3. Visualising observed flow values
 
 The aim of a Rainfall-Runoff model is to match up the predicted channel discharge values that the model produces with the observed values, measured in real life. This can be difficult because it will be tempting to adjust parameters as much as possible to align with real life, but we must avoid this because the parameters must attempt to reflect the hydrological processes within the catchment and the value we decide for them has to be justified by a hydrological process or characteristic observed in the catchment. Over calibrating and tweaking parameters for no reason, reduces accuracy in the model predicting extreme events if it doesn't align with the correct processes and characteristics. 
 
@@ -368,7 +352,7 @@ This enables us to view each year more easily. What can you notice about each on
 - Flow in 2017 is a lot lower than the previous 2 years. 
 
 <a name="4"></a>
-### 4. Parameters
+## 4. Parameters
 
 <a name="4a."></a>
 ### 4a. Understanding how to decide parameter values
@@ -378,10 +362,9 @@ I think the easiest way to understand the parameters we're going to be using, is
   <img src="{{ site.baseurl }}/Figures/Model.jpg" alt="Rainfall-Runoff model" width="600"/>
 *Figure 4: Rainfall-Runoff Model (Moore, 2007)*
 
-Look at P and follow the arrows downwards. The first thing we see is E (Evapotranspiration). How much precipitation is evapotranspirated? This will affect how much water is available for other pathways. This leads us to our first parameter:
+Look at P and follow the arrows downwards. The first thing we see is E (Evapotranspiration). This will affect how much water is available for other pathways. This leads us to our first parameter:
 
-<a name="4b."></a>
-### 4b. L1
+# L1
 
 Loss term 1! 
 This parameter will account for Et losses AND interception losses. This is the amount of precipitation that is intercepted by trees or plants on its way down. We will decide this by visualising Et data throughout the year, identify patterns and seasonal changes. For interception, we can use CEH to look at vegetation cover over the catchment. Is it mostly urban? rural? woodland? agriculture? 
@@ -419,70 +402,88 @@ From this, we can see:
 
 So what does this mean? Well.. based on the Et graph, we may choose to separate into seasons.
 
-- __November to March__ = Little Et, little interception by urban/woodland therefore we may expect a large amount of rainfall to reach the surface = __0.8__ (80% of rainfall reaches the surface. 20% is either intercepted or evapotranspires)
+- November to March = Little Et, little interception by urban/woodland therefore we may expect a large amount of rainfall to reach the surface = __0.8__ (80% of rainfall reaches the surface. 20% is either intercepted or evapotranspires)
 
-- __April to May__ and __August to October__ = Mid Et = __0.5__
+- April to May and August to October = Mid Et = __0.5__
 
-- __June to July__ = VERY high Et = __0.2__ 
+- June to July = VERY high Et = __0.2__ 
 
+# Surface to channel (C1)
 
+Okay now lets think about what happens to precipitation when it hits the surface. It's either going to infiltrate into the ground (__C2__) or run straight to the channel, over the surface as surface runoff (__C1__). 
 
   <img src="{{ site.baseurl }}/Figures/Model.jpg" alt="Rainfall-Runoff model" width="600"/>
 *Figure 4: Rainfall-Runoff Model (Moore, 2007)*
 
-# 5.2 Surface to Channel (C1) ----
+For this, we need to be thinking about:
+- __TOPOGRAPHY__: UPLAND = STEEP = FAST RUNOFF
+- __SOIL TYPE__: Permeable or impermeable?
 
-# Topography, soil type - permeable, impermeable? 
+Guess what! [CEH](https://nrfa.ceh.ac.uk/data/search) contains everything we need! The catchment has low permeability, upland, but it does have floodplains which can store water in flood events, reducing runoff. In general, we would expect this parameter value to be high due to the low permeability, meaning less water will infiltrate and the upland topography promoting fast runoff. However, it does contain floodplains so we can't make the value too high. 
 
-# Low permeability 
-# UPLAND = STEEP = FAST RUNOFF
-# However, it does have floodplains which can store water in flood events, reducing runoff.
-# But generally, we would expect this number to be high. 
-# C1 + C2 CANT EQUAL 1 OR MORE THAN 1 = STORAGE IS EMPTY
+What do we think?
 
-# 0.6 = 60% of water goes straight to channel.
+__C1 = 0.6__ (meaning 60% of water goes straight to the channel).
 
-# 5.3 Surface to ground (C2) ----
+> **_TIP:_** As we're keeping this model pretty simple, we're going to assume it remains the same throughout the whole year. But, if you were to create a model of your own, you might want to consider changing this value seasonally with changes in groundwater and soil moisture storage, which may differ throughout the year and therefore have an affect on C2 (infiltration) rates, ultimately affecting C1 as well! 
 
-# Low permeability
+# Surface to ground (C2)
 
-# 0.3
+__C2__ represents the fraction of water in the surface storage that infiltrates into the groundwater storage. Factors that influence this include, soil type, vegetation cover and the intensity of rainfall. 
 
-# 5.4 Ground to channel (C3) ----
+  <img src="{{ site.baseurl }}/Figures/Geology.png" alt="Catchment geology" width="600"/>
+*Figure 5: Catchment geology (UK Centre for Ecology and Hydrology, 2024)*
 
-# 0.55
+Figure 5 displays geology at the Tweed Catchment. We can see that 87% of the bedrock is very low permeability, suggesting a low C2 value, also considering the upland nature of the catchment. 
 
-# 5.5 Loss term 2 (L2) ----
+__C2 = 0.3__ 
 
-# How much leakage occurs? 
+> **_TIP:_** __C1__ and __C2__ CAN NOT = 1 because this means that 100% of water is either going straight to the channel or leaving the surface storage, leaving the surface storage completely empty for the next month - not realistic! 
 
-# This is hard, you may have to research for this.
+# Ground to channel (C3)
 
-# But lets just say 20% for now. 
+This is baseflow and C2 will represent the fraction of water in the groundwater storage that flows into the channel through the ground. C3 can be difficult to get right as it relies on having further knowledge on the trends in groundwater recharge and soil moisture change throughout the year. This might be slighty beyound this tutorial, but if you were to build your own model, you would research into this and perhaps have more information on this area. But for now, we will give it a parameter of 0.3 due to the low permeability of the soil, making it difficult for water to move through it. 
 
-# 6 ---- BUILDING THE MODEL ----
+__C3 = 0.3__
+
+# L2
+
+This is loss term 2 and it represents the portion of water that is lost through leakage. Again, this is difficult to control for and requires further research on the catchment. For now, we will give it a parameter of 0.2, stating that 20% of groundwater storage leaks out to the wider area. 
+
+__L2 = 0.2__
+
+I hope this gives you a better understanding of each of the parameters and how we decide on the values.
+
+<a name="5."></a>
+## 5. Building the model
+
+Yay! Finally, we're reading to start creating the model with our data set and chosen parameter values. Are you ready? 
+
+First, we need to get only one value for each month as right now all the values each day in each month are the same. We only need one! Then, we will create a new dataset called `Rainfall_Runoff_Model` which will store our model. 
+
+```r
+# ---- BUILDING THE MODEL ----
 
 # Aggregate daily data into monthly data so we only have 1 row each month
-Monthly_data <- Data %>%
+Monthly_data <- Filtered_data %>%
   group_by(Year, MM) %>% # Group by Year and Month
   summarize(
     # Retain the first value for columns that don't vary within the month
     Monthly_precipitation_m = first(Monthly_precipitation_m),
-    Observed_flow = first(Observed_flow),
     .groups = "drop" # Ungroup after summarizing
   )
 
 # Create columns of each stage in the model
 Rainfall_Runoff_Model <- Monthly_data %>%
   mutate(
-    Area = 694,
-    Initial_surface_storage = 0,
-    Initial_ground_storage = 0,
+    Area = 694, #km2 (the area of the catchment is on the CEH website)
+    Initial_surface_storage = 0, # For January we start on 0.
+    Initial_ground_storage = 0, # For Jan!
     C1 = 0.6,
     C2 = 0.3,
     C3 = 0.55,
     L2 = 0.2,
-    Surface_storage = NA,
+    Surface_storage = NA, 
     Ground_storage = NA,
     Surface_to_channel = NA,
     Surface_to_ground = NA,
@@ -490,24 +491,33 @@ Rainfall_Runoff_Model <- Monthly_data %>%
     Pred_channel_input = NA,
     Pred_mean_channel_discharge = NA
   )
+```
 
-# Iterate over months in the data
-for (i in 1:nrow(Rainfall_Runoff_Model)) {
+Now, something to note is within this model, the values of Feb rely on values from Jan, and values from March rely on values from Feb and so on.... therefore, we need to create a sort of loop-like cycle that will capture this process.
+
+To do this, we need to set up a `for loop` which is useful when you need to process rows individually. 
+
+```
+  # Iterate over rows (months) in the data
+  for (i in 1:nrow(Rainfall_Runoff_Model)) { 
 
   # Extract the current row
   current_month <- Rainfall_Runoff_Model[i, ]
 
-  # Calculate total water input
+  # Calculate the number of days in the current month
+  Days_in_month <- days_in_month(ymd(paste(current_month$Year, current_month$MM, "01")))
+
+  # Calculate total water input based on precipitation
   Total_water_input <- current_month$Monthly_precipitation_m * current_month$Area * 1000000
 
-  # Calculate surface storage
+  # Calculate surface storage for the current month
   Surface_storage <- current_month$Initial_surface_storage + 0.8 * Total_water_input
 
   # Calculate surface to channel and surface to ground
   Surface_to_channel <- current_month$C1 * Surface_storage
   Surface_to_ground <- current_month$C2 * Surface_storage
 
-  # Calculate ground storage
+  # Calculate ground storage based on the initial ground storage left from previous month + leakage + amount of water flowing from the surface to the ground
   Ground_storage <- current_month$Initial_ground_storage + current_month$L2 + Surface_to_ground
 
   # Calculate ground to channel
@@ -516,10 +526,10 @@ for (i in 1:nrow(Rainfall_Runoff_Model)) {
   # Predicted channel input
   Pred_channel_input <- Surface_to_channel + Ground_to_channel
 
-  # Predicted mean channel discharge
-  Pred_mean_channel_discharge <- Pred_channel_input / (31 * 24 * 60 * 60)  # Assuming all months have 31 days
+  # Predicted mean channel discharge (m3/s) 
+  Pred_mean_channel_discharge <- Pred_channel_input / (Days_in_month * 24 * 60 * 60)  
 
-  # Update the values in the dataset
+  # Save all the values back into the dataset
   Rainfall_Runoff_Model$Surface_storage[i] <- Surface_storage
   Rainfall_Runoff_Model$Ground_storage[i] <- Ground_storage
   Rainfall_Runoff_Model$Surface_to_channel[i] <- Surface_to_channel
@@ -528,32 +538,49 @@ for (i in 1:nrow(Rainfall_Runoff_Model)) {
   Rainfall_Runoff_Model$Pred_channel_input[i] <- Pred_channel_input
   Rainfall_Runoff_Model$Pred_mean_channel_discharge[i] <- Pred_mean_channel_discharge
 
-  # Update initial values for the next month, if it exists
+  # Update initial surface and ground storage for the next month, based on how much water is left over.
   if (i < nrow(Rainfall_Runoff_Model)) {
     Rainfall_Runoff_Model$Initial_surface_storage[i + 1] <- Surface_storage * (1 - current_month$C1 - current_month$C2)
     Rainfall_Runoff_Model$Initial_ground_storage[i + 1] <- Ground_storage - Ground_to_channel
   }
 }
+```
 
-# 8 ---- Time to compare ----
+<a name="6."></a>
+## 6. Time to compare predicted values VS. observed values
 
-# Assuming 'Rainfall_Runoff_Model' has columns: Date, Rainfall, Runoff
+We've nearly reached the end. I hope you've understood so far. Once you've got your model working, the way to test if you've succeeded and managed to represent the hydrological dynamics of your catchment is to plot up the observed values against your fresh predicted 'modelled' values. 
 
+```r
+# ---- Time to compare ----
+
+# Create a 'Date' column with first day of each month
 Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
-  # Create a 'Date' column with first day of each month
   mutate(Date = seq(ymd("2015-01-01"), by = "month", length.out = nrow(Rainfall_Runoff_Model)))
+
+# Add observed values to the model using left_join!
+
+Observed_values$Date <- as.Date(Observed_values$Date) # Remember it needs to be in the right format to match with Date in the model dataset.
+
+# Select only the 'Observed_flow_m3pers' column from Observed_values and join it with Rainfall_Runoff_Model
+Rainfall_Runoff_Model <- Rainfall_Runoff_Model %>%
+  left_join(Observed_values %>% select(Date, Observed_flow_m3pers), by = "Date")
 
 # PLOT!!!!!
 ggplot(Rainfall_Runoff_Model, aes(x = Date)) +
   geom_line(aes(y = Pred_mean_channel_discharge, color = "Predicted mean channel discharge"), size = 1) +
-  geom_line(aes(y = Observed_flow, color = "Observed flow"), size = 1, linetype = "dashed") +
+  geom_line(aes(y = Observed_flow_m3pers, color = "Observed monthly mean flow"), size = 1, linetype = "dashed") +
   labs(
-    title = "Rainfall and Runoff Over Time",
-    x = "Date",
-    y = "Flow (m³)",
+    x = "Year",
+    y = "Flow (m³/s)",
     color = "Legend"
   ) +
-  scale_color_manual(values = c("Predicted mean channel discharge" = "blue", "Observed flow" = "red")) +
-  theme_minimal()
+  scale_color_viridis(discrete = TRUE) +
+  theme_bw() +
+  theme(
+  panel.grid = element_blank())
+```
 
-# YAYYY
+  <img src="{{ site.baseurl }}/Figures/Final.plot.png" alt="Predicted flow against observed flow" width="900"/>
+*Figure 6: Predicted flow against observed flow (m3/s)*
+
